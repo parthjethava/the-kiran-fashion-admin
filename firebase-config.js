@@ -14,4 +14,4 @@ export const COLLECTIONS = {
   stock: "stock",
 };
 
-export const BOOTSTRAP_ADMIN_EMAIL = "admin@kiranfashion.com";
+export const BOOTSTRAP_ADMIN_EMAIL = "jethavapartp@gmail.com";
