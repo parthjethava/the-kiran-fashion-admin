@@ -1,0 +1,1406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>THE KIRAN FASHION — Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* =========================================================
+   THE KIRAN FASHION — Admin Console
+   Design tokens: ink & gold, garment-label motif
+   ========================================================= */
+
+:root{
+  --ink:        #17141F;
+  --ink-soft:   #221D2E;
+  --ink-line:   #322B3F;
+  --paper:      #FAF6EF;
+  --card:       #FFFFFF;
+  --gold:       #C39A5C;
+  --gold-deep:  #9C7A3F;
+  --gold-soft:  #EBDDBE;
+  --rose:       #A8435A;
+  --rose-soft:  #F3DEE2;
+  --slate:      #6E6678;
+  --slate-soft: #EFE9E0;
+  --line:       #E6DFD1;
+  --success:    #3F7D5C;
+  --success-soft:#DCEDE3;
+  --warn:       #B9812F;
+  --warn-soft:  #F6E7CC;
+
+  --radius-sm: 6px;
+  --radius: 12px;
+  --radius-lg: 18px;
+  --shadow-1: 0 1px 2px rgba(23,20,31,.06), 0 1px 1px rgba(23,20,31,.04);
+  --shadow-2: 0 12px 32px rgba(23,20,31,.14);
+
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  --sidebar-w: 250px;
+  --topbar-h: 58px;
+}
+
+*{ box-sizing: border-box; }
+html,body{ height:100%; }
+body{
+  margin:0;
+  font-family: var(--font-body);
+  background: var(--paper);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+h1,h2,h3,h4{ font-family: var(--font-display); font-weight:600; margin:0; letter-spacing:-.01em; }
+p{ margin:0; }
+button{ font-family: inherit; }
+input, select, textarea{ font-family: inherit; }
+::selection{ background: var(--gold-soft); }
+
+@media (prefers-reduced-motion: no-preference){
+  .view{ animation: fadeIn .25s ease both; }
+  @keyframes fadeIn{ from{ opacity:0; transform: translateY(4px);} to{ opacity:1; transform:none;} }
+}
+
+/* ---------- shared bits ---------- */
+.eyebrow{
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--gold-deep);
+  margin: 0 0 4px;
+}
+.tag-logo{
+  --s: 46px;
+  width: var(--s); height: var(--s);
+  border-radius: 8px;
+  background: linear-gradient(155deg, var(--ink) 0%, var(--ink-soft) 100%);
+  border: 1px dashed var(--gold);
+  display:flex; align-items:center; justify-content:center;
+  position:relative;
+}
+.tag-logo::before{
+  content:"";
+  position:absolute; top:6px; right:6px;
+  width:5px; height:5px; border-radius:50%;
+  background: var(--paper);
+  box-shadow: 0 0 0 1px var(--gold);
+}
+.tag-logo span{
+  font-family: var(--font-display);
+  color: var(--gold-soft);
+  font-weight: 600;
+  font-size: 16px;
+  letter-spacing: .04em;
+}
+.tag-logo-sm{ --s: 34px; }
+.tag-logo-sm span{ font-size: 13px; }
+
+/* buttons */
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  padding: 10px 16px;
+  font-size: 13.5px; font-weight: 600;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  cursor:pointer;
+  transition: transform .12s ease, background .15s ease, border-color .15s ease, opacity .15s ease;
+  white-space: nowrap;
+}
+.btn:active{ transform: scale(.97); }
+.btn-primary{ background: var(--ink); color: var(--gold-soft); }
+.btn-primary:hover{ background: var(--ink-soft); }
+.btn-ghost{ background: transparent; color: var(--slate); border-color: var(--line); }
+.btn-ghost:hover{ background: var(--slate-soft); }
+.btn-danger{ background: var(--rose-soft); color: var(--rose); }
+.btn-danger:hover{ opacity:.85; }
+.btn-block{ width:100%; }
+.btn-sm{ padding: 6px 12px; font-size: 12.5px; }
+.btn-link{
+  background:none; border:none; color: var(--slate); font-size: 13px;
+  cursor:pointer; text-decoration: underline; text-underline-offset: 3px;
+  margin-top: 4px;
+}
+.icon-btn{
+  width:38px; height:38px; border-radius: 10px; border:1px solid var(--line);
+  background: var(--card); display:flex; align-items:center; justify-content:center; cursor:pointer;
+}
+.hamburger, .hamburger::before, .hamburger::after{
+  content:""; display:block; width:18px; height:2px; background: var(--ink); border-radius:2px;
+}
+.hamburger{ position:relative; }
+.hamburger::before{ position:absolute; top:-6px; }
+.hamburger::after{ position:absolute; top:6px; }
+
+/* ============ AUTH SCREEN ============ */
+.auth-screen{
+  min-height:100vh;
+  display:flex; align-items:center; justify-content:center;
+  padding: 24px;
+  background:
+    radial-gradient(circle at 12% 18%, rgba(195,154,92,.16), transparent 42%),
+    radial-gradient(circle at 88% 82%, rgba(168,67,90,.14), transparent 45%),
+    var(--ink);
+}
+.auth-panel{
+  width:100%; max-width: 380px;
+  background: var(--paper);
+  border-radius: var(--radius-lg);
+  padding: 36px 32px 28px;
+  box-shadow: var(--shadow-2);
+  text-align:center;
+}
+.auth-panel .tag-logo{ margin: 0 auto 18px; }
+.brand-title{ font-size: 22px; letter-spacing:.03em; margin-bottom:6px; }
+.brand-sub{ color: var(--slate); font-size: 13.5px; margin-bottom: 26px; line-height:1.5; }
+.auth-form{ text-align:left; display:flex; flex-direction:column; gap:14px; }
+.field{ display:flex; flex-direction:column; gap:6px; font-size:13px; font-weight:600; color: var(--ink); }
+.field input, .field select, .field textarea{
+  font-size: 14px;
+  padding: 11px 13px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--ink);
+  outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.field input:focus, .field select:focus, .field textarea:focus{
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px var(--gold-soft);
+}
+.form-error{
+  background: var(--rose-soft); color: var(--rose);
+  padding: 9px 12px; border-radius: var(--radius-sm);
+  font-size: 12.5px; font-weight: 600;
+}
+.auth-footnote{ margin-top: 22px; font-size: 11.5px; color: var(--slate); line-height:1.5; }
+
+/* ============ APP SHELL ============ */
+.app-shell{ display:flex; min-height:100vh; }
+
+.sidebar{
+  width: var(--sidebar-w);
+  background: var(--ink);
+  color: var(--paper);
+  display:flex; flex-direction:column;
+  position: fixed; top:0; left:0; bottom:0;
+  padding: 20px 16px;
+  z-index: 40;
+  transition: transform .25s ease;
+}
+.sidebar-top{ display:flex; align-items:center; gap:10px; padding: 4px 6px 22px; }
+.brand-mark{ display:flex; flex-direction:column; line-height:1.25; }
+.brand-mark strong{ font-family: var(--font-display); font-size:14px; letter-spacing:.03em; color:#fff; }
+.brand-mark span{ font-size:10.5px; color: var(--gold); letter-spacing:.08em; text-transform:uppercase; font-family: var(--font-mono); }
+
+.nav{ flex:1; display:flex; flex-direction:column; gap:2px; overflow-y:auto; }
+.nav-item{
+  display:flex; align-items:center; gap:10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  color: rgba(250,246,239,.68);
+  font-size: 13.5px; font-weight:600;
+  cursor:pointer;
+  border:none; background:none; text-align:left; width:100%;
+}
+.nav-item .dot{ width:6px; height:6px; border-radius:50%; background: currentColor; opacity:.5; }
+.nav-item:hover{ background: rgba(250,246,239,.06); color:#fff; }
+.nav-item.active{ background: var(--ink-soft); color: var(--gold-soft); }
+.nav-item.active .dot{ background: var(--gold); opacity:1; }
+
+.sidebar-bottom{ border-top: 1px solid var(--ink-line); padding-top: 14px; margin-top: 10px; }
+.user-card{ display:flex; align-items:center; gap:10px; margin-bottom: 12px; padding: 0 4px; }
+.avatar{
+  width:34px; height:34px; border-radius:50%;
+  background: linear-gradient(155deg, var(--gold), var(--gold-deep));
+  color: var(--ink); font-weight:700; font-size:13px;
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.user-meta{ display:flex; flex-direction:column; overflow:hidden; }
+.user-meta strong{ font-size:13px; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.role-tag{
+  font-family: var(--font-mono); font-size: 10px; letter-spacing:.06em; text-transform:uppercase;
+  color: var(--gold-soft); opacity:.85;
+}
+
+.sidebar-scrim{
+  display:none; position: fixed; inset:0; background: rgba(23,20,31,.5); z-index:30;
+}
+
+.topbar{
+  display:none;
+  position: sticky; top:0; z-index:20;
+  height: var(--topbar-h);
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
+  align-items:center; gap:12px; padding: 0 14px;
+}
+.topbar-title{ font-family: var(--font-display); font-weight:600; font-size:16px; flex:1; }
+.topbar-avatar{
+  width:30px;height:30px;border-radius:50%;
+  background: var(--ink); color: var(--gold-soft); font-weight:700; font-size:12px;
+  display:flex; align-items:center; justify-content:center;
+}
+
+.main{
+  flex:1;
+  margin-left: var(--sidebar-w);
+  padding: 30px 34px 60px;
+  max-width: 1180px;
+}
+
+.view-head{
+  display:flex; align-items:flex-end; justify-content:space-between; gap:14px;
+  margin-bottom: 22px; flex-wrap:wrap;
+}
+
+/* stat cards */
+.stat-grid{
+  display:grid; grid-template-columns: repeat(auto-fit, minmax(190px,1fr));
+  gap: 14px; margin-bottom: 26px;
+}
+.stat-card{
+  background: var(--card); border:1px solid var(--line); border-radius: var(--radius);
+  padding: 18px 18px 16px; box-shadow: var(--shadow-1);
+  position:relative; overflow:hidden;
+}
+.stat-card::after{
+  content:""; position:absolute; right:-18px; top:-18px; width:70px; height:70px; border-radius:50%;
+  background: var(--gold-soft); opacity:.5;
+}
+.stat-card strong{ display:block; font-family: var(--font-display); font-size: 26px; margin-top:6px; position:relative; }
+.stat-card span{ font-size:12px; color: var(--slate); font-weight:600; letter-spacing:.02em; position:relative; }
+
+/* panel + table */
+.panel{
+  background: var(--card); border:1px solid var(--line); border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-1); overflow:hidden;
+}
+.panel-head{ padding: 16px 20px 0; }
+.panel-head h3{ font-size:15px; }
+.table-wrap{ overflow-x:auto; padding: 6px 4px 4px; }
+.data-table{ width:100%; border-collapse: collapse; min-width: 560px; }
+.data-table th{
+  text-align:left; font-size: 11px; letter-spacing:.08em; text-transform:uppercase;
+  color: var(--slate); font-weight:700; padding: 12px 16px; border-bottom: 1px solid var(--line);
+}
+.data-table td{
+  padding: 13px 16px; font-size:13.5px; border-bottom: 1px solid var(--line); vertical-align:middle;
+}
+.data-table tr:last-child td{ border-bottom:none; }
+.data-table tr:hover td{ background: rgba(195,154,92,.05); }
+.cell-strong{ font-weight:700; }
+.cell-mono{ font-family: var(--font-mono); font-size:12px; color: var(--slate); }
+.cell-actions{ display:flex; gap:6px; justify-content:flex-end; }
+.empty-row td{ text-align:center; color: var(--slate); padding: 34px 16px; font-size:13px; }
+
+/* status / role pills */
+.pill{
+  display:inline-flex; align-items:center; gap:5px;
+  padding: 4px 10px; border-radius: 999px;
+  font-size: 11px; font-weight:700; letter-spacing:.02em; text-transform:capitalize;
+}
+.pill::before{ content:""; width:6px; height:6px; border-radius:50%; background:currentColor; }
+.pill-gold{ background: var(--gold-soft); color: var(--gold-deep); }
+.pill-rose{ background: var(--rose-soft); color: var(--rose); }
+.pill-success{ background: var(--success-soft); color: var(--success); }
+.pill-warn{ background: var(--warn-soft); color: var(--warn); }
+.pill-slate{ background: var(--slate-soft); color: var(--slate); }
+
+.perm-chips{ display:flex; flex-wrap:wrap; gap:4px; max-width:220px; }
+.perm-chip{
+  font-family: var(--font-mono); font-size:10px; padding:3px 7px; border-radius:6px;
+  background: var(--slate-soft); color: var(--slate);
+}
+
+/* ============ MODAL ============ */
+.modal-root{ position:fixed; inset:0; z-index:100; }
+.modal-scrim{ position:absolute; inset:0; background: rgba(23,20,31,.55); }
+.modal{
+  position:relative; z-index:2;
+  width: 100%; max-width: 480px;
+  margin: 5vh auto; max-height: 90vh; overflow-y:auto;
+  background: var(--paper); border-radius: var(--radius-lg);
+  padding: 26px 26px 22px; box-shadow: var(--shadow-2);
+}
+.modal-head{ display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:18px; }
+.modal-head h3{ font-size:18px; }
+.modal-close{
+  border:none; background: var(--slate-soft); color: var(--slate);
+  width:28px; height:28px; border-radius:50%; cursor:pointer; font-size:14px; line-height:1;
+}
+.modal-form{ display:flex; flex-direction:column; gap:14px; }
+.form-row{ display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
+.checkbox-grid{
+  display:grid; grid-template-columns: 1fr 1fr; gap:8px 14px;
+  background: var(--card); border:1px solid var(--line); border-radius: var(--radius-sm);
+  padding: 12px;
+}
+.checkbox-row{ display:flex; align-items:center; gap:8px; font-size:12.5px; font-weight:600; }
+.checkbox-row input{ width:15px; height:15px; accent-color: var(--gold-deep); }
+.perm-group{ margin-bottom: 4px; }
+.perm-group-title{
+  font-family: var(--font-mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.08em;
+  color: var(--gold-deep); margin: 10px 0 6px;
+}
+.modal-actions{ display:flex; gap:10px; margin-top: 6px; }
+.modal-actions .btn{ flex:1; }
+.helper-text{ font-size: 11.5px; color: var(--slate); margin-top:-6px; }
+
+/* ============ TOASTS ============ */
+.toast-stack{
+  position:fixed; bottom: 20px; right: 20px; z-index: 200;
+  display:flex; flex-direction:column; gap:8px; max-width: 320px;
+}
+.toast{
+  background: var(--ink); color:#fff; padding: 12px 16px; border-radius: var(--radius-sm);
+  font-size: 13px; box-shadow: var(--shadow-2);
+  display:flex; align-items:center; gap:8px;
+  animation: toastIn .2s ease both;
+  border-left: 3px solid var(--gold);
+}
+.toast.toast-error{ border-left-color: var(--rose); }
+.toast.toast-success{ border-left-color: var(--success); }
+@keyframes toastIn{ from{ opacity:0; transform: translateY(6px);} to{ opacity:1; transform:none; } }
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 900px){
+  .sidebar{ transform: translateX(-100%); box-shadow: var(--shadow-2); }
+  .sidebar.open{ transform:none; }
+  .sidebar-scrim.open{ display:block; }
+  .topbar{ display:flex; }
+  .main{ margin-left:0; padding: 22px 16px 50px; }
+  .form-row{ grid-template-columns: 1fr; }
+  .checkbox-grid{ grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 480px){
+  .checkbox-grid{ grid-template-columns: 1fr; }
+  .modal{ margin: 3vh 12px; padding: 20px 18px; }
+  .auth-panel{ padding: 30px 22px 22px; }
+}
+
+</style>
+</head>
+<body>
+
+
+  <!-- ===================== LOGIN SCREEN ===================== -->
+  <div id="loginScreen" class="auth-screen">
+    <div class="auth-panel">
+      <div class="tag-logo" aria-hidden="true">
+        <span>KF</span>
+      </div>
+      <p class="eyebrow">Staff &amp; Admin Access</p>
+      <h1 class="brand-title">THE KIRAN FASHION</h1>
+      <p class="brand-sub">Sign in to manage orders, stock and the catalogue.</p>
+
+      <form id="loginForm" class="auth-form">
+        <label class="field">
+          <span>Email</span>
+          <input type="email" id="loginEmail" required autocomplete="username" placeholder="you@kiranfashion.com" />
+        </label>
+        <label class="field">
+          <span>Password</span>
+          <input type="password" id="loginPassword" required autocomplete="current-password" placeholder="••••••••" />
+        </label>
+        <button type="submit" class="btn btn-primary btn-block" id="loginBtn">Sign In</button>
+        <button type="button" class="btn-link" id="forgotBtn">Forgot password?</button>
+        <p id="loginError" class="form-error" hidden></p>
+      </form>
+      <p class="auth-footnote">Accounts are created by an administrator. Contact yours if you don't have a login.</p>
+    </div>
+  </div>
+
+  <!-- ===================== APP SHELL ===================== -->
+  <div id="app" class="app-shell" hidden>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-top">
+        <div class="tag-logo tag-logo-sm" aria-hidden="true"><span>KF</span></div>
+        <div class="brand-mark">
+          <strong>KIRAN FASHION</strong>
+          <span>Admin Console</span>
+        </div>
+      </div>
+
+      <nav class="nav" id="nav">
+        <!-- nav items injected by app.js -->
+      </nav>
+
+      <div class="sidebar-bottom">
+        <div class="user-card">
+          <div class="avatar" id="userAvatar">–</div>
+          <div class="user-meta">
+            <strong id="userName">—</strong>
+            <span id="userRoleBadge" class="role-tag">—</span>
+          </div>
+        </div>
+        <button class="btn btn-ghost btn-block" id="logoutBtn">Sign Out</button>
+      </div>
+    </aside>
+
+    <!-- Mobile top bar -->
+    <header class="topbar">
+      <button id="menuToggle" class="icon-btn" aria-label="Toggle menu">
+        <span class="hamburger"></span>
+      </button>
+      <div class="topbar-title" id="topbarTitle">Dashboard</div>
+      <div class="topbar-avatar" id="topbarAvatar">–</div>
+    </header>
+    <div class="sidebar-scrim" id="sidebarScrim"></div>
+
+    <!-- Main content -->
+    <main class="main" id="main">
+
+      <!-- ---------- Dashboard view ---------- -->
+      <section id="view-dashboard" class="view">
+        <div class="view-head">
+          <div>
+            <p class="eyebrow">Overview</p>
+            <h2>Good to see you</h2>
+          </div>
+        </div>
+        <div class="stat-grid" id="statGrid"></div>
+        <div class="panel">
+          <div class="panel-head">
+            <h3>Recent Orders</h3>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table" id="dashRecentOrders">
+              <thead><tr><th>Order</th><th>Customer</th><th>Status</th><th>Total</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------- Users view (Admin only) ---------- -->
+      <section id="view-users" class="view" hidden>
+        <div class="view-head">
+          <div>
+            <p class="eyebrow">Team</p>
+            <h2>Users &amp; Permissions</h2>
+          </div>
+          <button class="btn btn-primary" id="addUserBtn">+ New User</button>
+        </div>
+        <div class="panel">
+          <div class="table-wrap">
+            <table class="data-table" id="usersTable">
+              <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Permissions</th><th></th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------- Products view ---------- -->
+      <section id="view-products" class="view" hidden>
+        <div class="view-head">
+          <div>
+            <p class="eyebrow">Catalogue</p>
+            <h2>Products</h2>
+          </div>
+          <button class="btn btn-primary" id="addProductBtn">+ New Product</button>
+        </div>
+        <div class="panel">
+          <div class="table-wrap">
+            <table class="data-table" id="productsTable">
+              <thead><tr><th>Product</th><th>SKU</th><th>Category</th><th>Price</th><th>Stock</th><th></th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------- Orders view ---------- -->
+      <section id="view-orders" class="view" hidden>
+        <div class="view-head">
+          <div>
+            <p class="eyebrow">Fulfilment</p>
+            <h2>Orders</h2>
+          </div>
+          <button class="btn btn-primary" id="addOrderBtn">+ New Order</button>
+        </div>
+        <div class="panel">
+          <div class="table-wrap">
+            <table class="data-table" id="ordersTable">
+              <thead><tr><th>Order</th><th>Customer</th><th>Items</th><th>Total</th><th>Status</th><th></th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------- Stock view ---------- -->
+      <section id="view-stock" class="view" hidden>
+        <div class="view-head">
+          <div>
+            <p class="eyebrow">Inventory</p>
+            <h2>Stock Levels</h2>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="table-wrap">
+            <table class="data-table" id="stockTable">
+              <thead><tr><th>Product</th><th>SKU</th><th>On Hand</th><th>Reorder At</th><th>Status</th><th></th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ===================== MODAL ROOT ===================== -->
+  <div id="modalRoot" class="modal-root" hidden>
+    <div class="modal-scrim" id="modalScrim"></div>
+    <div class="modal" id="modalBox"></div>
+  </div>
+
+  <!-- ===================== TOASTS ===================== -->
+  <div id="toastStack" class="toast-stack"></div>
+<script type="module">
+// =========================================================
+// THE KIRAN FASHION — Firebase configuration
+// =========================================================
+// 1. Go to https://console.firebase.google.com → your project
+//    → Project settings → General → "Your apps" → Web app.
+// 2. Copy the config object shown there and paste it below.
+// 3. In the Firebase console, enable:
+//      Authentication → Sign-in method → Email/Password
+//      Firestore Database → Create database
+// 4. Apply the security rules in firestore.rules (Firestore → Rules).
+// =========================================================
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBBACjKMNxr2jzevolXW3GaqBOBdD4CJH4",
+  authDomain: "the-kiran-fashion.firebaseapp.com",
+  projectId: "the-kiran-fashion",
+  storageBucket: "the-kiran-fashion.firebasestorage.app",
+  messagingSenderId: "88989985858",
+  appId: "1:88989985858:web:4a2eede7bde64090d2d1db",
+};
+
+// Collection names (change here if you want different names in Firestore).
+const COLLECTIONS = {
+  users: "users",
+  products: "products",
+  orders: "orders",
+  stock: "stock",
+};
+
+// The very first admin account. On first run, if this email signs in
+// and has no Firestore user document yet, app.js will create one for
+// them with the admin role so there's always a way in.
+// Set it, sign up that email/password once in the Firebase console
+// (Authentication → Users → Add user), then sign in here.
+const BOOTSTRAP_ADMIN_EMAIL = "jethavaparthp@gmail.com";
+
+// =========================================================
+// THE KIRAN FASHION — Admin Console
+// Vanilla JS + Firebase v10 modular SDK (via CDN, ES modules)
+// =========================================================
+
+
+import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut,
+  sendPasswordResetEmail, createUserWithEmailAndPassword,
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+  getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc,
+  collection, onSnapshot, query, orderBy, serverTimestamp, addDoc,
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+/* ---------------------------------------------------------
+   Firebase init — a secondary app instance lets an admin
+   create a new staff account without being signed out of
+   their own session (createUser normally swaps the session
+   to the new user, which we don't want here).
+--------------------------------------------------------- */
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const secondaryApp = initializeApp(firebaseConfig, "Secondary");
+const secondaryAuth = getAuth(secondaryApp);
+
+/* ---------------------------------------------------------
+   Roles & permissions
+--------------------------------------------------------- */
+const ROLES = [
+  { id: "admin", label: "Admin" },
+  { id: "order_manager", label: "Order Manager" },
+  { id: "stock_manager", label: "Stock Manager" },
+  { id: "product_manager", label: "Product Manager" },
+];
+const MODULES = ["users", "products", "orders", "stock"];
+const ACTIONS = ["view", "create", "edit", "delete"];
+
+function emptyPerms() {
+  const p = {};
+  MODULES.forEach((m) => (p[m] = { view: false, create: false, edit: false, delete: false }));
+  return p;
+}
+function defaultPermissions(role) {
+  const p = emptyPerms();
+  const allOn = (m) => (p[m] = { view: true, create: true, edit: true, delete: true });
+  if (role === "admin") MODULES.forEach(allOn);
+  if (role === "order_manager") { allOn("orders"); p.products.view = true; p.stock.view = true; }
+  if (role === "stock_manager") { allOn("stock"); p.products.view = true; }
+  if (role === "product_manager") { allOn("products"); p.stock.view = true; }
+  return p;
+}
+function roleLabel(id) { return ROLES.find((r) => r.id === id)?.label || id; }
+
+/* ---------------------------------------------------------
+   Small DOM / UX helpers
+--------------------------------------------------------- */
+const $ = (sel, root = document) => root.querySelector(sel);
+const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+
+function escapeHtml(str = "") {
+  return String(str).replace(/[&<>"']/g, (c) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+  }[c]));
+}
+function initials(name = "", email = "") {
+  const src = name?.trim() || email || "?";
+  const parts = src.split(" ").filter(Boolean);
+  if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+  return src.slice(0, 2).toUpperCase();
+}
+function fmtMoney(n) {
+  const v = Number(n || 0);
+  return "₹" + v.toLocaleString("en-IN", { maximumFractionDigits: 0 });
+}
+function toast(message, type = "info") {
+  const stack = $("#toastStack");
+  const el = document.createElement("div");
+  el.className = "toast" + (type === "error" ? " toast-error" : type === "success" ? " toast-success" : "");
+  el.textContent = message;
+  stack.appendChild(el);
+  setTimeout(() => el.remove(), 3800);
+}
+function openModal(innerHtml) {
+  $("#modalBox").innerHTML = innerHtml;
+  $("#modalRoot").hidden = false;
+}
+function closeModal() {
+  $("#modalRoot").hidden = true;
+  $("#modalBox").innerHTML = "";
+}
+$("#modalScrim").addEventListener("click", closeModal);
+
+/* ---------------------------------------------------------
+   App state
+--------------------------------------------------------- */
+const state = {
+  profile: null,       // {uid,email,name,role,permissions,status}
+  users: [],
+  products: [],
+  orders: [],
+  stock: [],
+  currentView: "dashboard",
+  unsub: [],            // active onSnapshot unsubscribers
+};
+
+function can(module, action) {
+  if (!state.profile) return false;
+  if (state.profile.role === "admin") return true;
+  return !!state.profile.permissions?.[module]?.[action];
+}
+
+/* ---------------------------------------------------------
+   Auth: login / logout / forgot password
+--------------------------------------------------------- */
+$("#loginForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const email = $("#loginEmail").value.trim();
+  const password = $("#loginPassword").value;
+  const btn = $("#loginBtn");
+  const errBox = $("#loginError");
+  errBox.hidden = true;
+  btn.disabled = true;
+  btn.textContent = "Signing in…";
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+  } catch (err) {
+    errBox.textContent = friendlyAuthError(err);
+    errBox.hidden = false;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Sign In";
+  }
+});
+
+$("#forgotBtn").addEventListener("click", async () => {
+  const email = $("#loginEmail").value.trim();
+  if (!email) { toast("Enter your email above first.", "error"); return; }
+  try {
+    await sendPasswordResetEmail(auth, email);
+    toast("Password reset email sent.", "success");
+  } catch (err) {
+    toast(friendlyAuthError(err), "error");
+  }
+});
+
+$("#logoutBtn").addEventListener("click", () => signOut(auth));
+
+function friendlyAuthError(err) {
+  const code = err?.code || "";
+  if (code.includes("invalid-credential") || code.includes("wrong-password") || code.includes("user-not-found"))
+    return "Incorrect email or password.";
+  if (code.includes("too-many-requests")) return "Too many attempts. Try again later.";
+  if (code.includes("invalid-email")) return "That email address looks invalid.";
+  return err?.message || "Something went wrong. Please try again.";
+}
+
+/* ---------------------------------------------------------
+   Auth state → load profile → boot / teardown app
+--------------------------------------------------------- */
+onAuthStateChanged(auth, async (user) => {
+  teardownListeners();
+  if (!user) {
+    state.profile = null;
+    $("#loginScreen").hidden = false;
+    $("#app").hidden = true;
+    return;
+  }
+  try {
+    const profile = await loadOrBootstrapProfile(user);
+    if (!profile) {
+      toast("Your account has no profile. Contact an admin.", "error");
+      await signOut(auth);
+      return;
+    }
+    if (profile.status === "inactive") {
+      toast("This account has been deactivated.", "error");
+      await signOut(auth);
+      return;
+    }
+    state.profile = profile;
+    $("#loginScreen").hidden = true;
+    $("#app").hidden = false;
+    renderShellForProfile();
+    attachDataListeners();
+    navigateTo(defaultViewFor(profile), true);
+  } catch (err) {
+    console.error(err);
+    toast("Couldn't load your profile: " + (err.message || err), "error");
+  }
+});
+
+async function loadOrBootstrapProfile(user) {
+  const ref = doc(db, COLLECTIONS.users, user.uid);
+  const snap = await getDoc(ref);
+  if (snap.exists()) return { uid: user.uid, ...snap.data() };
+
+  // No profile yet. If this is the designated bootstrap admin email,
+  // create their admin profile automatically so there's always a way in.
+  if (user.email === BOOTSTRAP_ADMIN_EMAIL) {
+    const profile = {
+      name: user.email.split("@")[0],
+      email: user.email,
+      role: "admin",
+      permissions: defaultPermissions("admin"),
+      status: "active",
+      createdAt: serverTimestamp(),
+    };
+    await setDoc(ref, profile);
+    return { uid: user.uid, ...profile };
+  }
+  return null;
+}
+
+function defaultViewFor(profile) {
+  if (can("orders", "view") || profile.role === "order_manager") return "dashboard";
+  return "dashboard";
+}
+
+/* ---------------------------------------------------------
+   Shell rendering: sidebar nav, user card, view guards
+--------------------------------------------------------- */
+const NAV_ITEMS = [
+  { id: "dashboard", label: "Dashboard", module: null },
+  { id: "orders", label: "Orders", module: "orders" },
+  { id: "stock", label: "Stock", module: "stock" },
+  { id: "products", label: "Products", module: "products" },
+  { id: "users", label: "Users", module: "users" },
+];
+
+function renderShellForProfile() {
+  const p = state.profile;
+  $("#userName").textContent = p.name || p.email;
+  $("#userAvatar").textContent = initials(p.name, p.email);
+  $("#topbarAvatar").textContent = initials(p.name, p.email);
+  $("#userRoleBadge").textContent = roleLabel(p.role);
+
+  const nav = $("#nav");
+  nav.innerHTML = "";
+  NAV_ITEMS.forEach((item) => {
+    if (item.module && !can(item.module, "view")) return;
+    const btn = document.createElement("button");
+    btn.className = "nav-item";
+    btn.dataset.view = item.id;
+    btn.innerHTML = `<span class="dot"></span><span>${item.label}</span>`;
+    btn.addEventListener("click", () => { navigateTo(item.id); closeMobileNav(); });
+    nav.appendChild(btn);
+  });
+}
+
+function navigateTo(viewId, silent) {
+  const item = NAV_ITEMS.find((n) => n.id === viewId);
+  if (item?.module && !can(item.module, "view")) viewId = "dashboard";
+  state.currentView = viewId;
+
+  $$(".view").forEach((v) => (v.hidden = true));
+  const target = $("#view-" + viewId);
+  if (target) target.hidden = false;
+
+  $$(".nav-item").forEach((b) => b.classList.toggle("active", b.dataset.view === viewId));
+  const label = NAV_ITEMS.find((n) => n.id === viewId)?.label || "Dashboard";
+  $("#topbarTitle").textContent = label;
+
+  renderCurrentView();
+  if (!silent) window.scrollTo(0, 0);
+}
+
+function renderCurrentView() {
+  if (state.currentView === "dashboard") renderDashboard();
+  if (state.currentView === "users") renderUsersTable();
+  if (state.currentView === "products") renderProductsTable();
+  if (state.currentView === "orders") renderOrdersTable();
+  if (state.currentView === "stock") renderStockTable();
+}
+
+/* Mobile nav toggle */
+$("#menuToggle").addEventListener("click", () => {
+  $("#sidebar").classList.add("open");
+  $("#sidebarScrim").classList.add("open");
+});
+$("#sidebarScrim").addEventListener("click", closeMobileNav);
+function closeMobileNav() {
+  $("#sidebar").classList.remove("open");
+  $("#sidebarScrim").classList.remove("open");
+}
+
+/* ---------------------------------------------------------
+   Firestore listeners
+--------------------------------------------------------- */
+function teardownListeners() {
+  state.unsub.forEach((fn) => fn());
+  state.unsub = [];
+}
+
+function attachDataListeners() {
+  if (can("users", "view")) {
+    const q = query(collection(db, COLLECTIONS.users));
+    state.unsub.push(onSnapshot(q, (snap) => {
+      state.users = snap.docs.map((d) => ({ uid: d.id, ...d.data() }));
+      if (state.currentView === "users") renderUsersTable();
+      if (state.currentView === "dashboard") renderDashboard();
+    }, (err) => toast("Users: " + err.message, "error")));
+  }
+  if (can("products", "view")) {
+    const q = query(collection(db, COLLECTIONS.products));
+    state.unsub.push(onSnapshot(q, (snap) => {
+      state.products = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      if (state.currentView === "products") renderProductsTable();
+      if (state.currentView === "dashboard") renderDashboard();
+      if (state.currentView === "stock") renderStockTable();
+    }, (err) => toast("Products: " + err.message, "error")));
+  }
+  if (can("orders", "view")) {
+    const q = query(collection(db, COLLECTIONS.orders));
+    state.unsub.push(onSnapshot(q, (snap) => {
+      state.orders = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      if (state.currentView === "orders") renderOrdersTable();
+      if (state.currentView === "dashboard") renderDashboard();
+    }, (err) => toast("Orders: " + err.message, "error")));
+  }
+  if (can("stock", "view")) {
+    const q = query(collection(db, COLLECTIONS.stock));
+    state.unsub.push(onSnapshot(q, (snap) => {
+      state.stock = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      if (state.currentView === "stock") renderStockTable();
+      if (state.currentView === "dashboard") renderDashboard();
+    }, (err) => toast("Stock: " + err.message, "error")));
+  }
+}
+
+/* ---------------------------------------------------------
+   DASHBOARD
+--------------------------------------------------------- */
+function renderDashboard() {
+  const cards = [];
+  if (can("orders", "view")) {
+    const pending = state.orders.filter((o) => o.status === "pending").length;
+    cards.push(statCard("Orders", state.orders.length, `${pending} pending`));
+  }
+  if (can("products", "view")) cards.push(statCard("Products", state.products.length, "in catalogue"));
+  if (can("stock", "view")) {
+    const low = state.stock.filter((s) => Number(s.qty) <= Number(s.reorderAt ?? 0)).length;
+    cards.push(statCard("Low Stock", low, "items to reorder"));
+  }
+  if (can("users", "view")) cards.push(statCard("Team", state.users.length, "user accounts"));
+  $("#statGrid").innerHTML = cards.join("") || `<p class="helper-text">Nothing to show yet.</p>`;
+
+  const tbody = $("#dashRecentOrders tbody");
+  if (!can("orders", "view")) {
+    $("#dashRecentOrders").closest(".panel").hidden = true;
+  } else {
+    $("#dashRecentOrders").closest(".panel").hidden = false;
+    const rows = [...state.orders]
+      .sort((a, b) => (b.createdAtMs || 0) - (a.createdAtMs || 0))
+      .slice(0, 6);
+    tbody.innerHTML = rows.length ? rows.map((o) => `
+      <tr>
+        <td class="cell-strong">#${escapeHtml(o.id.slice(-6).toUpperCase())}</td>
+        <td>${escapeHtml(o.customerName || "—")}</td>
+        <td>${statusPill(o.status)}</td>
+        <td>${fmtMoney(o.total)}</td>
+      </tr>`).join("") : `<tr class="empty-row"><td colspan="4">No orders yet.</td></tr>`;
+  }
+}
+function statCard(label, value, sub) {
+  return `<div class="stat-card"><span>${escapeHtml(label)}</span><strong>${value}</strong><span>${escapeHtml(sub)}</span></div>`;
+}
+function statusPill(status) {
+  const map = {
+    pending: "pill-warn", processing: "pill-gold", shipped: "pill-slate",
+    delivered: "pill-success", cancelled: "pill-rose",
+    active: "pill-success", inactive: "pill-rose",
+    "in stock": "pill-success", low: "pill-warn", out: "pill-rose",
+  };
+  return `<span class="pill ${map[status] || "pill-slate"}">${escapeHtml(status || "—")}</span>`;
+}
+
+/* ===========================================================
+   USERS (admin only)
+=========================================================== */
+function renderUsersTable() {
+  const tbody = $("#usersTable tbody");
+  if (!state.users.length) {
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="6">No users yet — add your first teammate.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = state.users.map((u) => `
+    <tr>
+      <td class="cell-strong">${escapeHtml(u.name || "—")}</td>
+      <td>${escapeHtml(u.email || "—")}</td>
+      <td><span class="pill pill-gold">${escapeHtml(roleLabel(u.role))}</span></td>
+      <td>${statusPill(u.status)}</td>
+      <td>${permChips(u.permissions)}</td>
+      <td class="cell-actions">
+        ${can("users", "edit") ? `<button class="btn btn-ghost btn-sm" data-edit-user="${u.uid}">Edit</button>` : ""}
+        ${can("users", "delete") ? `<button class="btn btn-danger btn-sm" data-del-user="${u.uid}">Remove</button>` : ""}
+      </td>
+    </tr>`).join("");
+
+  $$("[data-edit-user]", tbody).forEach((b) => b.addEventListener("click", () => openUserModal(b.dataset.editUser)));
+  $$("[data-del-user]", tbody).forEach((b) => b.addEventListener("click", () => confirmDeleteUser(b.dataset.delUser)));
+}
+function permChips(permissions) {
+  if (!permissions) return "—";
+  const chips = MODULES.filter((m) => permissions[m]?.view).map((m) => `<span class="perm-chip">${m}</span>`);
+  return chips.length ? `<div class="perm-chips">${chips.join("")}</div>` : "—";
+}
+
+$("#addUserBtn").addEventListener("click", () => openUserModal(null));
+
+function openUserModal(uid) {
+  const editing = !!uid;
+  const u = editing ? state.users.find((x) => x.uid === uid) : null;
+  const role = u?.role || "order_manager";
+  const perms = u?.permissions || defaultPermissions(role);
+
+  openModal(`
+    <div class="modal-head">
+      <h3>${editing ? "Edit User" : "New User"}</h3>
+      <button class="modal-close" id="mClose">✕</button>
+    </div>
+    <form class="modal-form" id="userForm">
+      <label class="field"><span>Full name</span>
+        <input type="text" id="uName" required value="${escapeHtml(u?.name || "")}" placeholder="e.g. Priya Shah" />
+      </label>
+      <label class="field"><span>Email</span>
+        <input type="email" id="uEmail" required ${editing ? "disabled" : ""} value="${escapeHtml(u?.email || "")}" placeholder="name@kiranfashion.com" />
+      </label>
+      ${editing ? `<p class="helper-text">Email can't be changed here. Use "Send password reset" if they're locked out.</p>` : `
+      <label class="field"><span>Temporary password</span>
+        <input type="password" id="uPassword" required minlength="6" placeholder="At least 6 characters" />
+      </label>`}
+      <label class="field"><span>Role</span>
+        <select id="uRole">
+          ${ROLES.map((r) => `<option value="${r.id}" ${r.id === role ? "selected" : ""}>${r.label}</option>`).join("")}
+        </select>
+      </label>
+      ${editing ? `
+      <label class="field"><span>Status</span>
+        <select id="uStatus">
+          <option value="active" ${u?.status !== "inactive" ? "selected" : ""}>Active</option>
+          <option value="inactive" ${u?.status === "inactive" ? "selected" : ""}>Inactive</option>
+        </select>
+      </label>` : ""}
+
+      <div>
+        <p class="helper-text" style="margin-bottom:8px;">Permissions — changing the role fills sensible defaults; tick or untick anything.</p>
+        <div id="permBlock"></div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="mCancel">Cancel</button>
+        <button type="submit" class="btn btn-primary" id="uSave">${editing ? "Save Changes" : "Create User"}</button>
+      </div>
+    </form>
+  `);
+
+  const permBlock = $("#permBlock");
+  function paintPerms(p) { permBlock.innerHTML = permissionGrid(p); }
+  paintPerms(perms);
+
+  $("#uRole").addEventListener("change", (e) => paintPerms(defaultPermissions(e.target.value)));
+  $("#mClose").addEventListener("click", closeModal);
+  $("#mCancel").addEventListener("click", closeModal);
+
+  $("#userForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const saveBtn = $("#uSave");
+    saveBtn.disabled = true;
+    saveBtn.textContent = "Saving…";
+    try {
+      const name = $("#uName").value.trim();
+      const roleVal = $("#uRole").value;
+      const permissions = readPermissionGrid();
+
+      if (editing) {
+        const statusVal = $("#uStatus").value;
+        await updateDoc(doc(db, COLLECTIONS.users, uid), { name, role: roleVal, permissions, status: statusVal });
+        toast("User updated.", "success");
+      } else {
+        const email = $("#uEmail").value.trim();
+        const password = $("#uPassword").value;
+        const cred = await createUserWithEmailAndPassword(secondaryAuth, email, password);
+        await setDoc(doc(db, COLLECTIONS.users, cred.user.uid), {
+          name, email, role: roleVal, permissions, status: "active", createdAt: serverTimestamp(),
+        });
+        await signOut(secondaryAuth); // clean up the secondary session
+        toast("User created.", "success");
+      }
+      closeModal();
+    } catch (err) {
+      toast(friendlyAuthError(err), "error");
+    } finally {
+      saveBtn.disabled = false;
+      saveBtn.textContent = editing ? "Save Changes" : "Create User";
+    }
+  });
+}
+
+function permissionGrid(p) {
+  return MODULES.map((m) => `
+    <div class="perm-group">
+      <div class="perm-group-title">${m}</div>
+      <div class="checkbox-grid">
+        ${ACTIONS.map((a) => `
+          <label class="checkbox-row">
+            <input type="checkbox" data-perm-mod="${m}" data-perm-action="${a}" ${p[m]?.[a] ? "checked" : ""} />
+            ${a}
+          </label>`).join("")}
+      </div>
+    </div>
+  `).join("");
+}
+function readPermissionGrid() {
+  const p = emptyPerms();
+  $$("[data-perm-mod]").forEach((box) => {
+    p[box.dataset.permMod][box.dataset.permAction] = box.checked;
+  });
+  return p;
+}
+
+function confirmDeleteUser(uid) {
+  const u = state.users.find((x) => x.uid === uid);
+  if (!u) return;
+  if (uid === state.profile.uid) { toast("You can't remove your own account.", "error"); return; }
+  openModal(`
+    <div class="modal-head"><h3>Remove ${escapeHtml(u.name || u.email)}?</h3>
+      <button class="modal-close" id="mClose">✕</button></div>
+    <p class="helper-text" style="font-size:13px;line-height:1.6;">
+      This removes their profile and revokes access immediately by deactivating the account.
+      Their sign-in record stays in Firebase Authentication — delete it there too, or wire up
+      the optional Cloud Function in <code>functions/</code> to remove it automatically.
+    </p>
+    <div class="modal-actions">
+      <button type="button" class="btn btn-ghost" id="mCancel">Cancel</button>
+      <button type="button" class="btn btn-danger" id="mConfirm">Remove User</button>
+    </div>
+  `);
+  $("#mClose").addEventListener("click", closeModal);
+  $("#mCancel").addEventListener("click", closeModal);
+  $("#mConfirm").addEventListener("click", async () => {
+    try {
+      await updateDoc(doc(db, COLLECTIONS.users, uid), { status: "inactive" });
+      await deleteDoc(doc(db, COLLECTIONS.users, uid));
+      toast("User removed.", "success");
+      closeModal();
+    } catch (err) {
+      toast(err.message, "error");
+    }
+  });
+}
+
+/* ===========================================================
+   PRODUCTS
+=========================================================== */
+function renderProductsTable() {
+  $("#addProductBtn").hidden = !can("products", "create");
+  const tbody = $("#productsTable tbody");
+  if (!state.products.length) {
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="6">No products yet.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = state.products.map((p) => {
+    const stockEntry = state.stock.find((s) => s.productId === p.id);
+    return `
+    <tr>
+      <td class="cell-strong">${escapeHtml(p.name)}</td>
+      <td class="cell-mono">${escapeHtml(p.sku || "—")}</td>
+      <td>${escapeHtml(p.category || "—")}</td>
+      <td>${fmtMoney(p.price)}</td>
+      <td>${stockEntry ? stockEntry.qty : "—"}</td>
+      <td class="cell-actions">
+        ${can("products", "edit") ? `<button class="btn btn-ghost btn-sm" data-edit-product="${p.id}">Edit</button>` : ""}
+        ${can("products", "delete") ? `<button class="btn btn-danger btn-sm" data-del-product="${p.id}">Delete</button>` : ""}
+      </td>
+    </tr>`;
+  }).join("");
+
+  $$("[data-edit-product]", tbody).forEach((b) => b.addEventListener("click", () => openProductModal(b.dataset.editProduct)));
+  $$("[data-del-product]", tbody).forEach((b) => b.addEventListener("click", () => deleteProduct(b.dataset.delProduct)));
+}
+
+$("#addProductBtn").addEventListener("click", () => openProductModal(null));
+
+function openProductModal(id) {
+  const editing = !!id;
+  const p = editing ? state.products.find((x) => x.id === id) : null;
+
+  openModal(`
+    <div class="modal-head"><h3>${editing ? "Edit Product" : "New Product"}</h3>
+      <button class="modal-close" id="mClose">✕</button></div>
+    <form class="modal-form" id="productForm">
+      <label class="field"><span>Product name</span>
+        <input type="text" id="pName" required value="${escapeHtml(p?.name || "")}" placeholder="e.g. Banarasi Silk Saree" /></label>
+      <div class="form-row">
+        <label class="field"><span>SKU</span>
+          <input type="text" id="pSku" required value="${escapeHtml(p?.sku || "")}" placeholder="KF-SAR-001" /></label>
+        <label class="field"><span>Category</span>
+          <input type="text" id="pCategory" value="${escapeHtml(p?.category || "")}" placeholder="Sarees" /></label>
+      </div>
+      <div class="form-row">
+        <label class="field"><span>Price (₹)</span>
+          <input type="number" min="0" step="1" id="pPrice" required value="${p?.price ?? ""}" /></label>
+        <label class="field"><span>Starting stock</span>
+          <input type="number" min="0" step="1" id="pStock" ${editing ? "disabled" : ""} value="${editing ? (state.stock.find(s=>s.productId===id)?.qty ?? 0) : 0}" /></label>
+      </div>
+      <label class="field"><span>Description</span>
+        <textarea id="pDesc" rows="3" placeholder="Fabric, fit, care notes…">${escapeHtml(p?.description || "")}</textarea></label>
+      ${editing ? "" : `<p class="helper-text">A matching stock entry is created automatically.</p>`}
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="mCancel">Cancel</button>
+        <button type="submit" class="btn btn-primary" id="pSave">${editing ? "Save Changes" : "Add Product"}</button>
+      </div>
+    </form>
+  `);
+  $("#mClose").addEventListener("click", closeModal);
+  $("#mCancel").addEventListener("click", closeModal);
+
+  $("#productForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const btn = $("#pSave");
+    btn.disabled = true; btn.textContent = "Saving…";
+    try {
+      const payload = {
+        name: $("#pName").value.trim(),
+        sku: $("#pSku").value.trim(),
+        category: $("#pCategory").value.trim(),
+        price: Number($("#pPrice").value || 0),
+        description: $("#pDesc").value.trim(),
+        updatedAt: serverTimestamp(),
+      };
+      if (editing) {
+        await updateDoc(doc(db, COLLECTIONS.products, id), payload);
+        toast("Product updated.", "success");
+      } else {
+        payload.createdAt = serverTimestamp();
+        const ref = await addDoc(collection(db, COLLECTIONS.products), payload);
+        await setDoc(doc(db, COLLECTIONS.stock, ref.id), {
+          productId: ref.id, productName: payload.name, sku: payload.sku,
+          qty: Number($("#pStock").value || 0), reorderAt: 5, updatedAt: serverTimestamp(),
+        });
+        toast("Product added.", "success");
+      }
+      closeModal();
+    } catch (err) {
+      toast(err.message, "error");
+    } finally {
+      btn.disabled = false; btn.textContent = editing ? "Save Changes" : "Add Product";
+    }
+  });
+}
+
+async function deleteProduct(id) {
+  if (!confirm("Delete this product? This can't be undone.")) return;
+  try {
+    await deleteDoc(doc(db, COLLECTIONS.products, id));
+    toast("Product deleted.", "success");
+  } catch (err) { toast(err.message, "error"); }
+}
+
+/* ===========================================================
+   ORDERS
+=========================================================== */
+const ORDER_STATUSES = ["pending", "processing", "shipped", "delivered", "cancelled"];
+
+function renderOrdersTable() {
+  $("#addOrderBtn").hidden = !can("orders", "create");
+  const tbody = $("#ordersTable tbody");
+  if (!state.orders.length) {
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="6">No orders yet.</td></tr>`;
+    return;
+  }
+  const rows = [...state.orders].sort((a, b) => (b.createdAtMs || 0) - (a.createdAtMs || 0));
+  tbody.innerHTML = rows.map((o) => `
+    <tr>
+      <td class="cell-strong">#${escapeHtml(o.id.slice(-6).toUpperCase())}</td>
+      <td>${escapeHtml(o.customerName || "—")}</td>
+      <td>${escapeHtml(o.items || "—")}</td>
+      <td>${fmtMoney(o.total)}</td>
+      <td>
+        ${can("orders", "edit")
+          ? `<select class="pill" style="border:none;" data-status-order="${o.id}">
+              ${ORDER_STATUSES.map((s) => `<option value="${s}" ${s === o.status ? "selected" : ""}>${s}</option>`).join("")}
+            </select>`
+          : statusPill(o.status)}
+      </td>
+      <td class="cell-actions">
+        ${can("orders", "delete") ? `<button class="btn btn-danger btn-sm" data-del-order="${o.id}">Delete</button>` : ""}
+      </td>
+    </tr>`).join("");
+
+  $$("[data-status-order]", tbody).forEach((sel) => sel.addEventListener("change", async () => {
+    try {
+      await updateDoc(doc(db, COLLECTIONS.orders, sel.dataset.statusOrder), { status: sel.value });
+      toast("Order status updated.", "success");
+    } catch (err) { toast(err.message, "error"); }
+  }));
+  $$("[data-del-order]", tbody).forEach((b) => b.addEventListener("click", async () => {
+    if (!confirm("Delete this order?")) return;
+    try { await deleteDoc(doc(db, COLLECTIONS.orders, b.dataset.delOrder)); toast("Order deleted.", "success"); }
+    catch (err) { toast(err.message, "error"); }
+  }));
+}
+
+$("#addOrderBtn").addEventListener("click", () => openOrderModal());
+
+function openOrderModal() {
+  openModal(`
+    <div class="modal-head"><h3>New Order</h3><button class="modal-close" id="mClose">✕</button></div>
+    <form class="modal-form" id="orderForm">
+      <label class="field"><span>Customer name</span>
+        <input type="text" id="oCustomer" required placeholder="e.g. Anjali Mehta" /></label>
+      <label class="field"><span>Items</span>
+        <input type="text" id="oItems" required placeholder="e.g. 2x Silk Saree, 1x Kurti" /></label>
+      <div class="form-row">
+        <label class="field"><span>Total (₹)</span>
+          <input type="number" min="0" step="1" id="oTotal" required /></label>
+        <label class="field"><span>Status</span>
+          <select id="oStatus">${ORDER_STATUSES.map((s) => `<option value="${s}">${s}</option>`).join("")}</select></label>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="mCancel">Cancel</button>
+        <button type="submit" class="btn btn-primary" id="oSave">Create Order</button>
+      </div>
+    </form>
+  `);
+  $("#mClose").addEventListener("click", closeModal);
+  $("#mCancel").addEventListener("click", closeModal);
+  $("#orderForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const btn = $("#oSave"); btn.disabled = true; btn.textContent = "Saving…";
+    try {
+      await addDoc(collection(db, COLLECTIONS.orders), {
+        customerName: $("#oCustomer").value.trim(),
+        items: $("#oItems").value.trim(),
+        total: Number($("#oTotal").value || 0),
+        status: $("#oStatus").value,
+        createdAt: serverTimestamp(),
+        createdAtMs: Date.now(),
+      });
+      toast("Order created.", "success");
+      closeModal();
+    } catch (err) { toast(err.message, "error"); }
+    finally { btn.disabled = false; btn.textContent = "Create Order"; }
+  });
+}
+
+/* ===========================================================
+   STOCK
+=========================================================== */
+function renderStockTable() {
+  const tbody = $("#stockTable tbody");
+  if (!state.stock.length) {
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="6">No stock entries yet — add a product to create one.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = state.stock.map((s) => {
+    const status = Number(s.qty) <= 0 ? "out" : Number(s.qty) <= Number(s.reorderAt ?? 0) ? "low" : "in stock";
+    return `
+    <tr>
+      <td class="cell-strong">${escapeHtml(s.productName || "—")}</td>
+      <td class="cell-mono">${escapeHtml(s.sku || "—")}</td>
+      <td>${can("stock", "edit")
+        ? `<input type="number" min="0" style="width:80px" data-qty-stock="${s.id}" value="${s.qty ?? 0}" />`
+        : (s.qty ?? 0)}</td>
+      <td>${can("stock", "edit")
+        ? `<input type="number" min="0" style="width:80px" data-reorder-stock="${s.id}" value="${s.reorderAt ?? 0}" />`
+        : (s.reorderAt ?? 0)}</td>
+      <td>${statusPill(status)}</td>
+      <td class="cell-actions">
+        ${can("stock", "edit") ? `<button class="btn btn-ghost btn-sm" data-save-stock="${s.id}">Save</button>` : ""}
+      </td>
+    </tr>`;
+  }).join("");
+
+  $$("[data-save-stock]", tbody).forEach((b) => b.addEventListener("click", async () => {
+    const id = b.dataset.saveStock;
+    const qty = Number($(`[data-qty-stock="${id}"]`).value || 0);
+    const reorderAt = Number($(`[data-reorder-stock="${id}"]`).value || 0);
+    try {
+      await updateDoc(doc(db, COLLECTIONS.stock, id), { qty, reorderAt, updatedAt: serverTimestamp() });
+      toast("Stock updated.", "success");
+    } catch (err) { toast(err.message, "error"); }
+  }));
+}
+
+/* ---------------------------------------------------------
+   Escape hatch: keep hash in sync (optional deep-linking)
+--------------------------------------------------------- */
+window.addEventListener("hashchange", () => {
+  const id = location.hash.replace("#", "");
+  if (id && NAV_ITEMS.some((n) => n.id === id)) navigateTo(id);
+});
+
+</script>
+</body>
+</html>
