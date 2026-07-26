@@ -3,7 +3,7 @@
 // Vanilla JS + Firebase v10 modular SDK (via CDN, ES modules)
 // =========================================================
 
-import { firebaseConfig, COLLECTIONS, ADMIN_EMAIL } from "./firebase-config.js";
+import { firebaseConfig, COLLECTIONS, BOOTSTRAP_ADMIN_EMAIL } from "./firebase-config.js";
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
   getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut,
@@ -199,7 +199,7 @@ async function loadOrBootstrapProfile(user) {
 
   // No profile yet. If this is the designated bootstrap admin email,
   // create their admin profile automatically so there's always a way in.
-  if (user.email === ADMIN_EMAIL) {
+  if (user.email === BOOTSTRAP_ADMIN_EMAIL) {
     const profile = {
       name: user.email.split("@")[0],
       email: user.email,
