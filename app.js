@@ -201,7 +201,7 @@ async function loadOrBootstrapProfile(user) {
 
   // No profile yet. If this is the designated bootstrap admin email,
   // create their admin profile automatically so there's always a way in.
-  if (user.email === BOOTSTRAP_ADMIN_EMAIL) {
+  if (user.email === jethavapartp@gmail.com) {
     const profile = {
       name: user.email.split("@")[0],
       email: user.email,
@@ -544,7 +544,7 @@ function confirmDeleteUser(uid) {
   $("#mCancel").addEventListener("click", closeModal);
   $("#mConfirm").addEventListener("click", async () => {
     try {
-      await updateDoc(doc(db, COLLECTIONS.users, uid), { status: "inactive" });
+      await updateDoc(doc(db, COLLECTIONS.users, uid), { status: "active" });
       await deleteDoc(doc(db, COLLECTIONS.users, uid));
       toast("User removed.", "success");
       closeModal();
