@@ -172,10 +172,16 @@ onAuthStateChanged(auth, async (user) => {
   try {
     const profile = await loadOrBootstrapProfile(user);
     if (!profile) {
-      toast("Your account has no profile. Contact an admin.", "error");
-      await signOut(auth);
-      return;
+  toast("Your account has no profile. Contact an admin.", "error");
+  await signOut(auth);
+  return;
+}
+
 if (profile.status === "inactive") {
+  toast("This account has been deactivated.", "error");
+  await signOut(auth);
+  return;
+}
     toast("This account has been deactivated.", "error");
     await signOut(auth);
     return;
@@ -542,7 +548,9 @@ function confirmDeleteUser(uid) {
   $("#mCancel").addEventListener("click", closeModal);
   $("#mConfirm").addEventListener("click", async () => {
     try {
-      await updateDoc(doc(db, COLLECTIONS.users, uid), { status: "active" });
+      await updateDoc(doc(db, COLLECTIONS.users, uid), {
+  status: "inactive"
+});
       await deleteDoc(doc(db, COLLECTIONS.users, uid));
       toast("User removed.", "success");
       closeModal();
