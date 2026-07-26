@@ -176,12 +176,11 @@ onAuthStateChanged(auth, async (user) => {
       toast("Your account has no profile. Contact an admin.", "error");
       await signOut(auth);
       return;
-    }
-    if (profile.status === "active") {
-      toast("This account has been deactivated.", "error");
-      await signOut(auth);
-      return;
-    }
+if (profile.status === "inactive") {
+    toast("This account has been deactivated.", "error");
+    await signOut(auth);
+    return;
+}
     state.profile = profile;
     $("#loginScreen").hidden = true;
     $("#app").hidden = false;
@@ -201,7 +200,7 @@ async function loadOrBootstrapProfile(user) {
 
   // No profile yet. If this is the designated bootstrap admin email,
   // create their admin profile automatically so there's always a way in.
-  if (user.email === jethavapartp@gmail.com) {
+  if (user.email === "jethavaparthp@gmail.com") {
     const profile = {
       name: user.email.split("@")[0],
       email: user.email,
