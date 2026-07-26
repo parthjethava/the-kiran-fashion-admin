@@ -3,7 +3,7 @@
 // Vanilla JS + Firebase v10 modular SDK (via CDN, ES modules)
 // =========================================================
 
-import { firebaseConfig, COLLECTIONS, BOOTSTRAP_ADMIN_EMAIL } from "./firebase-config.js";
+import { firebaseConfig, COLLECTIONS, jethavaparthp@gmail.com } from "./firebase-config.js";
 
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
@@ -177,7 +177,7 @@ onAuthStateChanged(auth, async (user) => {
       await signOut(auth);
       return;
     }
-    if (profile.status === "inactive") {
+    if (profile.status === "active") {
       toast("This account has been deactivated.", "error");
       await signOut(auth);
       return;
