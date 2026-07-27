@@ -662,7 +662,18 @@ function openProductModal(id) {
   $("#mClose").addEventListener("click", closeModal);
   $("#mCancel").addEventListener("click", closeModal);
 
-  $("#productForm").addEventListener("submit", async (e) => {
+  openModal(`
+<form class="modal-form" id="orderForm">
+...
+</form>
+`);
+
+$("#mClose").addEventListener("click", closeModal);
+$("#mCancel").addEventListener("click", closeModal);
+
+$("#orderForm").addEventListener("submit", async (e) => {
+   ...
+});
     e.preventDefault();
     const btn = $("#pSave");
     btn.disabled = true; btn.textContent = "Saving…";
@@ -722,6 +733,19 @@ function renderOrdersTable() {
     return;
   }
   const rows = [...state.orders].sort((a, b) => (b.createdAtMs || 0) - (a.createdAtMs || 0));
+
+tbody.innerHTML = rows.map((o) => `
+<tr>
+  <td class="cell-strong">${escapeHtml(o.customerName || "—")}</td>
+  <td>${escapeHtml(o.product || "—")}</td>
+  <td>${escapeHtml(o.size || "—")}</td>
+  <td>${escapeHtml(o.payment || "—")}</td>
+  <td>${statusPill(o.status)}</td>
+  <td class="cell-actions">
+    ${can("orders", "delete") ? `<button class="btn btn-danger btn-sm" data-del-order="${o.id}">Delete</button>` : ""}
+  </td>
+</tr>
+`).join("");
   tbody.innerHTML = rows.map((o) => `
     <tr>
       <td class="cell-strong">#${escapeHtml(o.id.slice(-6).toUpperCase())}</td>
@@ -757,42 +781,130 @@ $("#addOrderBtn").addEventListener("click", () => openOrderModal());
 
 function openOrderModal() {
   openModal(`
-    <div class="modal-head"><h3>New Order</h3><button class="modal-close" id="mClose">✕</button></div>
     <form class="modal-form" id="orderForm">
-      <label class="field"><span>Customer name</span>
-        <input type="text" id="oCustomer" required placeholder="e.g. Anjali Mehta" /></label>
-      <label class="field"><span>Items</span>
-        <input type="text" id="oItems" required placeholder="e.g. 2x Silk Saree, 1x Kurti" /></label>
-      <div class="form-row">
-        <label class="field"><span>Total (₹)</span>
-          <input type="number" min="0" step="1" id="oTotal" required /></label>
-        <label class="field"><span>Status</span>
-          <select id="oStatus">${ORDER_STATUSES.map((s) => `<option value="${s}">${s}</option>`).join("")}</select></label>
-      </div>
-      <div class="modal-actions">
-        <button type="button" class="btn btn-ghost" id="mCancel">Cancel</button>
-        <button type="submit" class="btn btn-primary" id="oSave">Create Order</button>
-      </div>
-    </form>
-  `);
-  $("#mClose").addEventListener("click", closeModal);
-  $("#mCancel").addEventListener("click", closeModal);
+
+<label class="field">
+<span>Company</span>
+<select id="oCompany">
+<option value="Meesho">Meesho</option>
+</select>
+</label>
+
+<label class="field">
+<span>Customer Name</span>
+<input type="text" id="oCustomer" required>
+</label>
+
+<label class="field">
+<span>Address</span>
+<textarea id="oAddress" rows="3" required></textarea>
+</label>
+
+<label class="field">
+<span>Mobile Number (Optional)</span>
+<input type="text" id="oMobile">
+</label>
+
+<label class="field">
+<span>Product Name</span>
+<input type="text" id="oProduct" required>
+</label>
+
+<label class="field">
+<span>Size</span>
+<select id="oSize" required>
+<option>XS</option>
+<option>S</option>
+<option>M</option>
+<option>L</option>
+<option>XL</option>
+<option>XXL</option>
+<option>XXXL</option>
+<option>4XL</option>
+<option>5XL</option>
+</select>
+</label>
+
+<label class="field">
+<span>Payment Mode</span>
+<select id="oPayment">
+<option>COD</option>
+<option>Online</option>
+</select>
+</label>
+
+<label class="field">
+<span>Order Status</span>
+<select id="oStatus">
+<option>On Hold</option>
+<option>Pending</option>
+<option>Ready to Ship</option>
+<option>Shipped</option>
+<option>Cancelled</option>
+</select>
+</label>
+
+<label class="field">
+<span>Courier Partner (Optional)</span>
+<select id="oCourier">
+<option value="">Select</option>
+<option>Valmo</option>
+<option>Xpressbees</option>
+<option>Shadowfax</option>
+<option>Delhivery</option>
+<option>Ecom</option>
+</select>
+</label>
+
+<label class="field">
+<span>Dispatch Date</span>
+<input type="date" id="oDispatch">
+</label>
+
+<label class="field">
+<span>Special Note (Optional)</span>
+<textarea id="oNote" rows="3"></textarea>
+</label>
+
+<div class="modal-actions">
+<button type="button" class="btn btn-ghost" id="mCancel">Cancel</button>
+<button type="submit" class="btn btn-primary" id="oSave">Review Order</button>
+</div>
+
+</form>
+`);
+
+$("#mClose").addEventListener("click", closeModal);
+$("#mCancel").addEventListener("click", closeModal);
+
+$("#orderForm").addEventListener("submit", async (e) => {
   $("#orderForm").addEventListener("submit", async (e) => {
     e.preventDefault();
     const btn = $("#oSave"); btn.disabled = true; btn.textContent = "Saving…";
     try {
-      await addDoc(collection(db, COLLECTIONS.orders), {
-        customerName: $("#oCustomer").value.trim(),
-        items: $("#oItems").value.trim(),
-        total: Number($("#oTotal").value || 0),
-        status: $("#oStatus").value,
-        createdAt: serverTimestamp(),
-        createdAtMs: Date.now(),
-      });
+  await addDoc(collection(db, COLLECTIONS.orders), {
+  company: $("#oCompany").value,
+  customerName: $("#oCustomer").value.trim(),
+  address: $("#oAddress").value.trim(),
+  mobile: $("#oMobile").value.trim(),
+  product: $("#oProduct").value.trim(),
+  size: $("#oSize").value,
+  payment: $("#oPayment").value,
+  status: $("#oStatus").value,
+  courier: $("#oCourier").value,
+  dispatchDate: $("#oDispatch").value,
+  note: $("#oNote").value.trim(),
+
+  createdBy: state.profile.name,
+  createdByEmail: state.profile.email,
+
+  createdAt: serverTimestamp(),
+  createdAtMs: Date.now(),
+});
       toast("Order created.", "success");
       closeModal();
     } catch (err) { toast(err.message, "error"); }
-    finally { btn.disabled = false; btn.textContent = "Create Order"; }
+    finally { btn.disabled = false; btn.textContent = "Review Order"; }
   });
 }
 
