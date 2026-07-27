@@ -404,11 +404,18 @@ function statCard(label, value, sub) {
 }
 function statusPill(status) {
   const map = {
-    pending: "pill-warn", processing: "pill-gold", shipped: "pill-slate",
-    delivered: "pill-success", cancelled: "pill-rose",
-    active: "pill-success", inactive: "pill-rose",
-    "in stock": "pill-success", low: "pill-warn", out: "pill-rose",
-  };
+  "On Hold": "pill-warn",
+  "Pending": "pill-gold",
+  "Ready to Ship": "pill-slate",
+  "Shipped": "pill-success",
+  "Cancelled": "pill-rose",
+
+  active: "pill-success",
+  inactive: "pill-rose",
+  "in stock": "pill-success",
+  low: "pill-warn",
+  out: "pill-rose",
+};
   return `<span class="pill ${map[status] || "pill-slate"}">${escapeHtml(status || "—")}</span>`;
 }
 
@@ -700,8 +707,13 @@ async function deleteProduct(id) {
 /* ===========================================================
    ORDERS
 =========================================================== */
-const ORDER_STATUSES = ["pending", "processing", "shipped", "delivered", "cancelled"];
-
+const ORDER_STATUSES = [
+  "On Hold",
+  "Pending",
+  "Ready to Ship",
+  "Shipped",
+  "Cancelled"
+];
 function renderOrdersTable() {
   $("#addOrderBtn").hidden = !can("orders", "create");
   const tbody = $("#ordersTable tbody");
