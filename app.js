@@ -177,15 +177,44 @@ onAuthStateChanged(auth, async (user) => {
   return;
 }
 
-if (profile.status === "inactive") {
-  toast("This account has been deactivated.", "error");
-  await signOut(auth);
-  return;
-}
-    toast("This account has been deactivated.", "error");
-    await signOut(auth);
+onAuthStateChanged(auth, async (user) => {
+  teardownListeners();
+
+  if (!user) {
+    state.profile = null;
+    $("#loginScreen").hidden = false;
+    $("#app").hidden = true;
     return;
-}
+  }
+
+  try {
+    const profile = await loadOrBootstrapProfile(user);
+
+    if (!profile) {
+      toast("Your account has no profile. Contact an admin.", "error");
+      await signOut(auth);
+      return;
+    }
+
+    if (profile.status === "inactive") {
+      toast("This account has been deactivated.", "error");
+      await signOut(auth);
+      return;
+    }
+
+    state.profile = profile;
+    $("#loginScreen").hidden = true;
+    $("#app").hidden = false;
+
+    renderShellForProfile();
+    attachDataListeners();
+    navigateTo(defaultViewFor(profile), true);
+
+  } catch (err) {
+    console.error(err);
+    toast("Couldn't load your profile: " + (err.message || err), "error");
+  }
+});
     state.profile = profile;
     $("#loginScreen").hidden = true;
     $("#app").hidden = false;
