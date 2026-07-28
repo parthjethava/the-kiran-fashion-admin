@@ -119,31 +119,37 @@ function iconBoxes() {
    ============================================================ */
 $('login-form').addEventListener('submit', function (e) {
   e.preventDefault();
+
   var email = $('login-email').value.trim();
   var password = $('login-password').value;
   var errorBox = $('login-error');
   var btn = $('login-btn');
+
   errorBox.style.display = 'none';
   btn.disabled = true;
   btn.textContent = 'Logging in...';
 
   auth.signInWithEmailAndPassword(email, password)
-    .catch(function (err) {
-      var msg = 'Login failed. Please check your email and password.';
-      if (err && err.code === 'auth/invalid-email') msg = 'That email address looks invalid.';
-      if (err && err.code === 'auth/user-not-found') msg = 'No account found with that email.';
-      if (err && err.code === 'auth/wrong-password') msg = 'Incorrect password.';
-      if (err && err.code === 'auth/too-many-requests') msg = 'Too many attempts. Please wait and try again.';
-      errorBox.textContent = msg;
+    .then(function(userCredential) {
+      alert("Login Success");
+      console.log(userCredential.user);
+    })
+    .catch(function(err) {
+      console.log(err);
+      alert(err.code + "\n" + err.message);
+
+      errorBox.textContent = err.code + " : " + err.message;
       errorBox.style.display = 'block';
     })
-    .finally(function () {
+    .finally(function() {
       btn.disabled = false;
       btn.textContent = 'Log in';
     });
 });
-
 $('logout-link').addEventListener('click', function (e) {
+  e.preventDefault();
+  auth.signOut();
+});
   e.preventDefault();
   auth.signOut();
 });
