@@ -22,13 +22,20 @@
    ============================================================ */
 
 var firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyBBACjKMNxr2jzevolXW3GaqBOBdD4CJH4",
+  authDomain: "the-kiran-fashion.firebaseapp.com",
+  projectId: "the-kiran-fashion",
+  storageBucket: "the-kiran-fashion.firebasestorage.app",
+  messagingSenderId: "88989985858",
+  appId: "1:88989985858:web:4a2eede7bde64090d2d1db"
 };
+
+firebase.initializeApp(firebaseConfig);
+
+var auth = firebase.auth();
+var db = firebase.firestore();
+
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 
 firebase.initializeApp(firebaseConfig);
 
