@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>THE KIRAN FASHION | Meesho CRM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&family=Roboto+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ================= TOAST ================= -->
+<div id="toast" class="toast"></div>
+
+<!-- ================= LOGIN VIEW ================= -->
+<div id="login-view" class="login-view">
+  <div class="login-card">
+    <div class="login-mark">KF</div>
+    <h1>THE KIRAN FASHION</h1>
+    <p class="sub">Meesho Seller CRM &mdash; sign in to continue</p>
+    <form id="login-form" autocomplete="off">
+      <div class="field">
+        <label for="login-email">Email</label>
+        <input id="login-email" type="email" placeholder="you@thekiranfashion.com" required autocomplete="username">
+      </div>
+      <div class="field">
+        <label for="login-password">Password</label>
+        <input id="login-password" type="password" placeholder="Enter your password" required autocomplete="current-password">
+      </div>
+      <div id="login-error" class="form-error" style="display:none;"></div>
+      <button type="submit" class="btn btn-primary btn-block" id="login-btn">Log in</button>
+    </form>
+    <p class="login-foot">Access is provisioned by your admin in the Firebase console. Contact them if you don't have an account.</p>
+  </div>
+</div>
+
+<!-- ================= APP SHELL ================= -->
+<div id="app-view" class="app-view">
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="side-head">
+      <div class="logo-box">KF</div>
+      <div class="logo-text-wrap">
+        <span class="logo-text">Kiran Fashion</span>
+        <span class="logo-sub">Meesho CRM</span>
+      </div>
+    </div>
+    <nav class="side-nav">
+      <a href="#" data-section="dashboard" class="nav-link active">
+        <span class="ic">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+        </span>
+        <span class="label">Dashboard</span>
+      </a>
+      <a href="#" data-section="orders" class="nav-link">
+        <span class="ic">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7l1.5-3h15L21 7"/><path d="M3 7h18v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7z"/><path d="M9 11a3 3 0 0 0 6 0"/></svg>
+        </span>
+        <span class="label">Orders</span>
+      </a>
+      <a href="#" data-section="products" class="nav-link">
+        <span class="ic">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8L12 3 3 8l9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg>
+        </span>
+        <span class="label">Products</span>
+      </a>
+      <a href="#" data-section="stock" class="nav-link">
+        <span class="ic">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="18" height="14" rx="2"/><path d="M3 7l3-4h12l3 4"/><path d="M9 11v3"/><path d="M15 11v3"/></svg>
+        </span>
+        <span class="label">Stock</span>
+      </a>
+      <a href="#" data-section="reports" class="nav-link">
+        <span class="ic">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V5"/><path d="M4 19h16"/><rect x="7" y="11" width="3" height="6"/><rect x="12" y="7" width="3" height="10"/><rect x="17" y="13" width="3" height="4"/></svg>
+        </span>
+        <span class="label">Reports</span>
+      </a>
+    </nav>
+    <div class="side-foot">
+      <div class="side-user" id="side-user">-</div>
+      <a href="#" id="logout-link">
+        <span class="ic">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+        </span>
+        <span class="label">Log out</span>
+      </a>
+    </div>
+  </aside>
+
+  <div class="main" id="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="icon-btn" id="hamburger-btn" aria-label="Toggle sidebar">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <h1 class="page-title" id="page-title">Dashboard</h1>
+      </div>
+      <button class="btn btn-primary btn-sm" id="topbar-new-order-btn">+ New order</button>
+    </div>
+
+    <div class="content">
+
+      <!-- ============ DASHBOARD ============ -->
+      <section class="view-section active" id="section-dashboard">
+        <div class="cards-grid" id="dashboard-cards"></div>
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Recent orders</h2>
+            <button class="btn btn-ghost btn-sm" data-goto="orders">View all</button>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table" id="recent-orders-table">
+              <thead>
+                <tr><th>Order</th><th>Customer</th><th>Product</th><th>Status</th><th>Amount</th></tr>
+              </thead>
+              <tbody id="recent-orders-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ ORDERS ============ -->
+      <section class="view-section" id="section-orders">
+        <div class="toolbar">
+          <input type="text" id="order-search" class="search-input" placeholder="Search by customer, product, SKU or mobile">
+          <select id="order-status-filter" class="select-input">
+            <option value="">All statuses</option>
+            <option>On Hold</option>
+            <option>Pending</option>
+            <option>Ready To Ship</option>
+            <option>Shipped</option>
+            <option>Completed</option>
+            <option>Cancelled</option>
+          </select>
+          <select id="order-courier-filter" class="select-input">
+            <option value="">All couriers</option>
+            <option>Valmo</option>
+            <option>Delhivery</option>
+            <option>Shadowfax</option>
+            <option>Xpressbees</option>
+            <option>Ecom Express</option>
+          </select>
+          <button class="btn btn-primary" id="orders-new-btn">+ New order</button>
+        </div>
+        <div class="panel">
+          <div class="table-wrap">
+            <table class="data-table" id="orders-table">
+              <thead>
+                <tr>
+                  <th>Order</th><th>Customer</th><th>Product / SKU</th><th>Size</th><th>Qty</th>
+                  <th>Payment</th><th>Courier</th><th>Pickup</th><th>Status</th><th>Amount</th><th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="orders-table-body"></tbody>
+            </table>
+            <p class="empty-note" id="orders-empty-note" style="display:none;">No orders match your search.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ ORDER FORM ============ -->
+      <section class="view-section" id="section-order-form">
+        <div class="panel form-panel">
+          <div class="panel-head">
+            <h2 id="order-form-title">New order</h2>
+          </div>
+          <form id="order-form">
+            <input type="hidden" id="order-doc-id" value="">
+            <div class="form-grid">
+              <div class="field">
+                <label>Company</label>
+                <input type="text" value="Meesho" disabled>
+              </div>
+              <div class="field">
+                <label for="f-customer-name">Customer name *</label>
+                <input type="text" id="f-customer-name" required placeholder="Full name">
+              </div>
+              <div class="field field-wide">
+                <label for="f-address">Address *</label>
+                <textarea id="f-address" required rows="2" placeholder="Full shipping address"></textarea>
+              </div>
+              <div class="field">
+                <label for="f-mobile">Mobile number (optional)</label>
+                <input type="tel" id="f-mobile" placeholder="10-digit mobile number" pattern="[0-9]{10}" maxlength="10">
+              </div>
+              <div class="field">
+                <label for="f-product-name">Product name *</label>
+                <input type="text" id="f-product-name" list="product-name-list" required placeholder="e.g. Kiran Cotton Kurti">
+                <datalist id="product-name-list"></datalist>
+              </div>
+              <div class="field">
+                <label for="f-sku">SKU *</label>
+                <input type="text" id="f-sku" list="product-sku-list" required placeholder="e.g. KF-KUR-001">
+                <datalist id="product-sku-list"></datalist>
+              </div>
+              <div class="field">
+                <label for="f-color">Color (optional)</label>
+                <input type="text" id="f-color" placeholder="e.g. Maroon">
+              </div>
+              <div class="field">
+                <label for="f-size">Size *</label>
+                <select id="f-size" required>
+                  <option value="">Select size</option>
+                  <option>XS</option><option>S</option><option>M</option><option>L</option>
+                  <option>XL</option><option>XXL</option><option>XXXL</option><option>4XL</option><option>5XL</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="f-qty">Quantity *</label>
+                <input type="number" id="f-qty" min="1" max="10" value="1" required>
+              </div>
+              <div class="field">
+                <label for="f-amount">Order amount (&#8377;) *</label>
+                <input type="number" id="f-amount" min="0" step="1" required placeholder="e.g. 599">
+              </div>
+              <div class="field">
+                <label for="f-payment">COD / Prepaid *</label>
+                <select id="f-payment" required>
+                  <option value="">Select payment type</option>
+                  <option value="COD">COD</option>
+                  <option value="Prepaid">Prepaid</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="f-courier">Courier partner *</label>
+                <select id="f-courier" required>
+                  <option value="">Select courier</option>
+                  <option>Valmo</option>
+                  <option>Delhivery</option>
+                  <option>Shadowfax</option>
+                  <option>Xpressbees</option>
+                  <option>Ecom Express</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="f-pickup-date">Pickup date *</label>
+                <input type="date" id="f-pickup-date" required>
+              </div>
+              <div class="field field-wide">
+                <label for="f-note">Special note (optional)</label>
+                <textarea id="f-note" rows="2" placeholder="Anything the packer or courier should know"></textarea>
+              </div>
+              <div class="field">
+                <label>Created by</label>
+                <input type="text" id="f-created-by" disabled>
+              </div>
+              <div class="field">
+                <label>Date &amp; time</label>
+                <input type="text" id="f-created-at" disabled>
+              </div>
+            </div>
+            <div class="form-error" id="order-form-error" style="display:none;"></div>
+            <div class="form-actions">
+              <button type="button" class="btn btn-ghost" id="order-form-cancel-btn">Cancel</button>
+              <button type="submit" class="btn btn-primary" id="order-form-review-btn">Review order</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- ============ REVIEW ORDER ============ -->
+      <section class="view-section" id="section-review-order">
+        <div class="panel form-panel">
+          <div class="panel-head">
+            <h2>Review order</h2>
+            <p class="panel-sub">Check every detail carefully. Nothing is saved until you confirm.</p>
+          </div>
+          <div class="review-grid" id="review-grid"></div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-ghost" id="review-back-btn">Back to edit</button>
+            <button type="button" class="btn btn-primary" id="review-confirm-btn">Confirm &amp; save order</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ PRODUCTS ============ -->
+      <section class="view-section" id="section-products">
+        <div class="toolbar">
+          <input type="text" id="product-search" class="search-input" placeholder="Search by product name or SKU">
+          <button class="btn btn-primary" id="add-product-btn">+ Add product</button>
+        </div>
+        <div class="panel">
+          <div class="table-wrap">
+            <table class="data-table" id="products-table">
+              <thead>
+                <tr><th>Product</th><th>SKU</th><th>Color</th><th>Sizes</th><th>Price</th><th>Stock</th><th>Actions</th></tr>
+              </thead>
+              <tbody id="products-table-body"></tbody>
+            </table>
+            <p class="empty-note" id="products-empty-note" style="display:none;">No products yet. Add your first product.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ STOCK ============ -->
+      <section class="view-section" id="section-stock">
+        <div class="toolbar">
+          <input type="text" id="stock-search" class="search-input" placeholder="Search by product name or SKU">
+          <select id="stock-filter" class="select-input">
+            <option value="">All stock levels</option>
+            <option value="low">Low stock (&lt; 5)</option>
+            <option value="out">Out of stock</option>
+          </select>
+        </div>
+        <div class="panel">
+          <div class="table-wrap">
+            <table class="data-table" id="stock-table">
+              <thead>
+                <tr><th>Product</th><th>SKU</th><th>Color</th><th>Current stock</th><th>Status</th><th>Actions</th></tr>
+              </thead>
+              <tbody id="stock-table-body"></tbody>
+            </table>
+            <p class="empty-note" id="stock-empty-note" style="display:none;">No products yet.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ REPORTS ============ -->
+      <section class="view-section" id="section-reports">
+        <div class="cards-grid" id="reports-cards"></div>
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Monthly order summary</h2>
+            <p class="panel-sub" id="reports-month-label"></p>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead><tr><th>Status</th><th>Orders</th><th>Amount</th></tr></thead>
+              <tbody id="reports-status-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<!-- ================= MODAL (products / stock / delete confirm) ================= -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal-box" id="modal-box"></div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
