@@ -27,7 +27,8 @@ var firebaseConfig = {
   projectId: "the-kiran-fashion",
   storageBucket: "the-kiran-fashion.firebasestorage.app",
   messagingSenderId: "88989985858",
-  appId: "1:88989985858:web:4a2eede7bde64090d2d1db"
+  appId: "1:88989985858:web:4a2eede7bde64090d2d1db",
+  measurementId: "G-TW7VZ8QPQJ"
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -35,15 +36,7 @@ firebase.initializeApp(firebaseConfig);
 var auth = firebase.auth();
 var db = firebase.firestore();
 
-auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-
-firebase.initializeApp(firebaseConfig);
-
-/* Global handles used throughout app.js */
-var auth = firebase.auth();
-var db = firebase.firestore();
-
-/* Keep the seller logged in between visits on this device */
-auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(function(err){
-  console.error("Auth persistence error:", err);
-});
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+  .catch(function(err) {
+    console.error(err);
+  });
