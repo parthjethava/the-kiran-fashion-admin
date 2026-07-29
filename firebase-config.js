@@ -36,7 +36,4 @@ firebase.initializeApp(firebaseConfig);
 var auth = firebase.auth();
 var db = firebase.firestore();
 
-auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-  .catch(function(err) {
-    console.error(err);
-  });
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
