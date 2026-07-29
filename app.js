@@ -150,9 +150,6 @@ $('logout-link').addEventListener('click', function (e) {
   e.preventDefault();
   auth.signOut();
 });
-  e.preventDefault();
-  auth.signOut();
-});
 
 auth.onAuthStateChanged(function (user) {
   if (user) {
