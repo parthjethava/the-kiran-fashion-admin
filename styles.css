@@ -307,6 +307,26 @@ a{color:inherit; text-decoration:none;}
 .form-grid{
   display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:16px 18px;
 }
+/* Product Photo Right Side */
+.product-photo-box{
+    width:170px;
+    text-align:center;
+    margin-left:auto;
+}
+
+.product-photo-box img{
+    width:170px;
+    height:220px;
+    object-fit:cover;
+    border:2px solid #ddd;
+    border-radius:12px;
+    background:#fff;
+}
+
+.product-photo-box input{
+    margin-top:10px;
+    width:100%;
+}
 .field-wide{grid-column:span 3;}
 .form-actions{display:flex; justify-content:flex-end; gap:10px; margin-top:20px; padding-top:16px; border-top:1px solid var(--border);}
 
