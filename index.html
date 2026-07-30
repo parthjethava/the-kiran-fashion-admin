@@ -170,16 +170,18 @@
           </div>  
           <form id="order-form">  
             <input type="hidden" id="order-doc-id" value="">  
-            <div class="form-grid">  
-              <div class="field">  
-                <div class="product-photo-box">  
-    <img id="preview-img"  
-         src="https://via.placeholder.com/140x180?text=No+Photo"  
-         alt="Product Photo">  <input type="file" id="f-photo" accept="image/*">  
-            </div> 
-            <label>Company</label>  
-            <input type="text" value="Meesho" disabled>  
-          </div> 
+            <div class="order-form-layout">
+<div class="form-grid">
+            <div class="field">
+    <label>Company</label>
+
+    <div style="display:flex;align-items:center;gap:10px;">
+        <img src="images/meesho-logo.png"
+             style="width:40px;height:40px;border-radius:8px;">
+
+        <input type="text" value="Meesho" disabled>
+    </div>
+            </div>
               <div class="field">
                 <label for="f-customer-name">Customer name *</label>
                 <input type="text" id="f-customer-name" required placeholder="Full name">
@@ -275,6 +277,17 @@
                 <input type="text" id="f-created-at" disabled>
               </div>
             </div>
+              </div>
+
+<div class="product-photo-box">
+    <img id="preview-img"
+         src="images/no-image.png"
+         alt="Product">
+
+    <input type="file" id="f-photo" accept="image/*">
+</div>
+
+        </div>
             <div class="form-error" id="order-form-error" style="display:none;"></div>
             <div class="form-actions">
               <button type="button" class="btn btn-ghost" id="order-form-cancel-btn">Cancel</button>
