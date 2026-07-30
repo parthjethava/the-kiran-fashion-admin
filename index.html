@@ -200,14 +200,18 @@
                 <datalist id="product-name-list"></datalist>
               </div>
               <div class="field">
-  <label for="f-photo">Product Photo</label>
-  <input type="file" id="f-photo" accept="image/*">
-</div>
+    <label>Product Photo</label>
 
-<div id="photo-preview" style="margin-top:10px;">
-  <img id="preview-img"
-       style="max-width:120px;display:none;border-radius:8px;border:1px solid #ddd;">
-</div>
+    <div class="product-photo-box">
+        <img id="preview-img"
+             src="images/no-image.png"
+             alt="Product">
+
+        <input type="file"
+               id="f-photo"
+               accept="image/*">
+    </div>
+              </div>
               <div class="field">
                 <label for="f-sku">SKU *</label>
                 <input type="text" id="f-sku" list="product-sku-list" required placeholder="e.g. KF-KUR-001">
@@ -225,17 +229,21 @@
                   <option>XL</option><option>XXL</option><option>XXXL</option><option>4XL</option><option>5XL</option>
                 </select>
               </div>
-              <select id="f-qty">
-  <option value="1">1</option>
-  <option value="2">2</option>
-  <option value="3">3</option>
-  <option value="4">4</option>
-  <option value="5">5</option>
-  <option value="6">6</option>
-  <option value="7">7</option>
-  <option value="8">8</option>
-  <option value="9">9</option>
-  <option value="10">10</option>
+              <div class="field">
+<label for="f-qty">Quantity</label>
+<select id="f-qty">
+  <option>1</option>
+  <option>2</option>
+  <option>3</option>
+  <option>4</option>
+  <option>5</option>
+  <option>6</option>
+  <option>7</option>
+  <option>8</option>
+  <option>9</option>
+  <option>10</option>
+</select>
+              </div>
               </select>
               <div class="field">
                 <label for="f-amount">Order amount (&#8377;) *</label>
