@@ -889,3 +889,19 @@ function openDeleteConfirm(type, id) {
     });
   });
 }
+const photoInput = document.getElementById("f-photo");
+const previewImg = document.getElementById("preview-img");
+
+if (photoInput) {
+  photoInput.addEventListener("change", function () {
+    const file = this.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      previewImg.src = e.target.result;
+      previewImg.style.display = "block";
+    };
+    reader.readAsDataURL(file);
+  });
+       }
