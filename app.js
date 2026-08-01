@@ -155,9 +155,6 @@ auth.onAuthStateChanged(function (user) {
   if (user) {
     currentUser = user;
     if (user) {
-
-    currentUser = user;
-
     db.collection("users").doc(user.uid).get().then(function(doc){
 
         if(doc.exists){
