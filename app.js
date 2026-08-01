@@ -164,7 +164,7 @@ auth.onAuthStateChanged(function (user) {
             if(data.role=="superadmin"){
                 window.isSuperAdmin=true;
             }else{
-                window.isSuperAdmin=false;
+                window.isSuperAdmin=true;
             }
 
         }else{
