@@ -162,9 +162,9 @@ auth.onAuthStateChanged(function (user) {
         var data = doc.data();
 
         if(data.role === "superadmin"){
-            window.isSuperAdmin = true;
+            window.issuperadmin = true;
         }else{
-            window.isSuperAdmin = false;
+            window.issuperadmin = false;
         }
 
         $('side-user').textContent = user.email;
