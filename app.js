@@ -129,81 +129,51 @@ $('login-form').addEventListener('submit', function (e) {
   btn.disabled = true;
   btn.textContent = 'Logging in...';
 
-  auth.signInWithEmailAndPassword(email, password)
-    .then(function(userCredential) {
-      alert("Login Success");
-      console.log(userCredential.user);
-    })
-    .catch(function(err) {
-      console.log(err);
-      alert(err.code + "\n" + err.message);
+  auth.onAuthStateChanged(function(user) {
 
-      errorBox.textContent = err.code + " : " + err.message;
-      errorBox.style.display = 'block';
-    })
-    .finally(function() {
-      btn.disabled = false;
-      btn.textContent = 'Log in';
-    });
-});
-$('logout-link').addEventListener('click', function (e) {
-  e.preventDefault();
-  auth.signOut();
-});
-
-auth.onAuthStateChanged(function (user) {
-  if (user) {
-    currentUser = user;
-    
   if (!user) {
     currentUser = null;
     detachListeners();
     orders = [];
     products = [];
 
-    $('app-view').classList.remove('active');
-    $('login-view').style.display = 'flex';
+    $("app-view").classList.remove("active");
+    $("login-view").style.display = "flex";
     return;
   }
 
   currentUser = user;
 
   db.collection("users").doc(user.uid).get()
-  .then(function(doc){
+    .then(function(doc) {
 
-    if(!doc.exists){
-      auth.signOut();
-      alert("User not found");
-      return;
-    }
-
-    const data = doc.data();
-
-    window.issuperadmin = data.role === "superadmin";
-
-    $('side-user').textContent = user.email;
-    $('login-view').style.display = 'none';
-    $('app-view').classList.add('active');
-
-    $('login-form').reset();
-    $('login-error').style.display = 'none';
-
-    attachListeners();
-    showSection('dashboard');
-
-  })
-  .catch(function(error){
-      console.log(error);
-      alert(error.message);
-  });
-
-});
+      if (!doc.exists) {
         auth.signOut();
         alert("User not found");
-    }
+        return;
+      }
+
+      var data = doc.data();
+
+      window.issuperadmin = data.role === "superadmin";
+
+      $("side-user").textContent = user.email;
+      $("login-view").style.display = "none";
+      $("app-view").classList.add("active");
+
+      $("login-form").reset();
+      $("login-error").style.display = "none";
+
+      attachListeners();
+      showSection("dashboard");
+
+    })
+    .catch(function(error) {
+      console.log(error);
+      alert(error.message);
+    });
 
 });
-
     $('side-user').textContent = user.email;
 
     $('login-view').style.display = 'none';
@@ -958,4 +928,3 @@ if (photoInput) {
     reader.readAsDataURL(file);
   });
        }
-o
