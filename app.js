@@ -157,22 +157,29 @@ auth.onAuthStateChanged(function (user) {
     if (user) {
     db.collection("users").doc(user.uid).get().then(function(doc){
 
-        if(doc.exists){
+    if(doc.exists){
 
-            var data = doc.data();
+        var data = doc.data();
 
-            if(data.role=="superadmin"){
-                window.isSuperAdmin=true;
-            }else{
-                window.isSuperAdmin=true;
-            }
-
+        if(data.role === "superadmin"){
+            window.isSuperAdmin = true;
         }else{
-            auth.signOut();
-            alert("User not found");
+            window.isSuperAdmin = false;
         }
 
-    });
+        $('side-user').textContent = user.email;
+        $('login-view').style.display = 'none';
+        $('app-view').classList.add('active');
+
+        attachListeners();
+        showSection('dashboard');
+
+    }else{
+        auth.signOut();
+        alert("User not found");
+    }
+
+});
 
     $('side-user').textContent = user.email;
 
