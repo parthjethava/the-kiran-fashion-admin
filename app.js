@@ -154,27 +154,51 @@ $('logout-link').addEventListener('click', function (e) {
 auth.onAuthStateChanged(function (user) {
   if (user) {
     currentUser = user;
-    if (user) {
-    db.collection("users").doc(user.uid).get().then(function(doc){
+    auth.onAuthStateChanged(function(user) {
 
-    if(doc.exists){
+  if (!user) {
+    currentUser = null;
+    detachListeners();
+    orders = [];
+    products = [];
 
-        var data = doc.data();
+    $('app-view').classList.remove('active');
+    $('login-view').style.display = 'flex';
+    return;
+  }
 
-        if(data.role === "superadmin"){
-            window.issuperadmin = true;
-        }else{
-            window.issuperadmin = false;
-        }
+  currentUser = user;
 
-        $('side-user').textContent = user.email;
-        $('login-view').style.display = 'none';
-        $('app-view').classList.add('active');
+  db.collection("users").doc(user.uid).get()
+  .then(function(doc){
 
-        attachListeners();
-        showSection('dashboard');
+    if(!doc.exists){
+      auth.signOut();
+      alert("User not found");
+      return;
+    }
 
-    }else{
+    const data = doc.data();
+
+    window.issuperadmin = data.role === "superadmin";
+
+    $('side-user').textContent = user.email;
+    $('login-view').style.display = 'none';
+    $('app-view').classList.add('active');
+
+    $('login-form').reset();
+    $('login-error').style.display = 'none';
+
+    attachListeners();
+    showSection('dashboard');
+
+  })
+  .catch(function(error){
+      console.log(error);
+      alert(error.message);
+  });
+
+});
         auth.signOut();
         alert("User not found");
     }
