@@ -154,14 +154,40 @@ $('logout-link').addEventListener('click', function (e) {
 auth.onAuthStateChanged(function (user) {
   if (user) {
     currentUser = user;
+    if (user) {
+
+    currentUser = user;
+
+    db.collection("users").doc(user.uid).get().then(function(doc){
+
+        if(doc.exists){
+
+            var data = doc.data();
+
+            if(data.role=="superadmin"){
+                window.isSuperAdmin=true;
+            }else{
+                window.isSuperAdmin=false;
+            }
+
+        }else{
+            auth.signOut();
+            alert("User not found");
+        }
+
+    });
+
     $('side-user').textContent = user.email;
+
     $('login-view').style.display = 'none';
     $('app-view').classList.add('active');
+
     $('login-form').reset();
     $('login-error').style.display = 'none';
+
     attachListeners();
     showSection('dashboard');
-  } else {
+}else {
     currentUser = null;
     detachListeners();
     orders = [];
