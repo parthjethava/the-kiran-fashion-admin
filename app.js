@@ -154,8 +154,7 @@ $('logout-link').addEventListener('click', function (e) {
 auth.onAuthStateChanged(function (user) {
   if (user) {
     currentUser = user;
-    auth.onAuthStateChanged(function(user) {
-
+    
   if (!user) {
     currentUser = null;
     detachListeners();
@@ -959,3 +958,4 @@ if (photoInput) {
     reader.readAsDataURL(file);
   });
        }
+o
