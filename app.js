@@ -134,20 +134,21 @@ $('login-form').addEventListener('submit', function (e) {
   if (!user) {
     currentUser = null;
     detachListeners();
+
     orders = [];
     products = [];
 
-    $("app-view").classList.remove("active");
-    $("login-view").style.display = "flex";
+    $('app-view').classList.remove('active');
+    $('login-view').style.display = 'flex';
     return;
   }
 
   currentUser = user;
 
   db.collection("users").doc(user.uid).get()
-    .then(function(doc) {
+    .then(function(doc){
 
-      if (!doc.exists) {
+      if(!doc.exists){
         auth.signOut();
         alert("User not found");
         return;
@@ -157,20 +158,26 @@ $('login-form').addEventListener('submit', function (e) {
 
       window.issuperadmin = data.role === "superadmin";
 
-      $("side-user").textContent = user.email;
-      $("login-view").style.display = "none";
-      $("app-view").classList.add("active");
+      if(window.issuperadmin){
+        $('admin-menu').style.display = "flex";
+      }else{
+        $('admin-menu').style.display = "none";
+      }
 
-      $("login-form").reset();
-      $("login-error").style.display = "none";
+      $('side-user').textContent = user.email;
+
+      $('login-view').style.display = 'none';
+      $('app-view').classList.add('active');
+
+      $('login-form').reset();
+      $('login-error').style.display = 'none';
 
       attachListeners();
-      showSection("dashboard");
+      showSection('dashboard');
 
     })
-    .catch(function(error) {
-      console.log(error);
-      alert(error.message);
+    .catch(function(err){
+      alert(err.message);
     });
 
 });
