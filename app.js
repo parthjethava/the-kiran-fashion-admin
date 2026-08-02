@@ -116,41 +116,59 @@ function iconBoxes() {
 
 /* ============================================================
    AUTH
-   ============================================================ */
+============================================================ */
+
 $('login-form').addEventListener('submit', function (e) {
   e.preventDefault();
 
   var email = $('login-email').value.trim();
   var password = $('login-password').value;
-  var errorBox = $('login-error');
+
   var btn = $('login-btn');
+  var errorBox = $('login-error');
 
-  errorBox.style.display = 'none';
+  errorBox.style.display = "none";
   btn.disabled = true;
-  btn.textContent = 'Logging in...';
+  btn.textContent = "Logging in...";
 
-  auth.onAuthStateChanged(function(user) {
+  auth.signInWithEmailAndPassword(email, password)
+    .catch(function (err) {
+      errorBox.style.display = "block";
+      errorBox.textContent = err.message;
+
+      btn.disabled = false;
+      btn.textContent = "Log in";
+    });
+});
+
+
+auth.onAuthStateChanged(function (user) {
 
   if (!user) {
+
     currentUser = null;
+
     detachListeners();
 
     orders = [];
     products = [];
 
     $('app-view').classList.remove('active');
-    $('login-view').style.display = 'flex';
+    $('login-view').style.display = "flex";
+
     return;
   }
 
   currentUser = user;
 
   db.collection("users").doc(user.uid).get()
-    .then(function(doc){
+    .then(function (doc) {
 
-      if(!doc.exists){
+      if (!doc.exists) {
+
         auth.signOut();
         alert("User not found");
+
         return;
       }
 
@@ -158,47 +176,40 @@ $('login-form').addEventListener('submit', function (e) {
 
       window.issuperadmin = data.role === "superadmin";
 
-      if(window.issuperadmin){
-        $('admin-menu').style.display = "flex";
-      }else{
-        $('admin-menu').style.display = "none";
+      if ($('admin-menu')) {
+        $('admin-menu').style.display =
+          window.issuperadmin ? "flex" : "none";
       }
 
       $('side-user').textContent = user.email;
 
-      $('login-view').style.display = 'none';
-      $('app-view').classList.add('active');
+      $('login-view').style.display = "none";
+      $('app-view').classList.add("active");
 
       $('login-form').reset();
-      $('login-error').style.display = 'none';
+
+      var btn = $('login-btn');
+      btn.disabled = false;
+      btn.textContent = "Log in";
 
       attachListeners();
-      showSection('dashboard');
+
+      showSection("dashboard");
 
     })
-    .catch(function(err){
+    .catch(function (err) {
       alert(err.message);
     });
 
 });
-    $('side-user').textContent = user.email;
 
-    $('login-view').style.display = 'none';
-    $('app-view').classList.add('active');
 
-    $('login-form').reset();
-    $('login-error').style.display = 'none';
+$('logout-link').addEventListener('click', function (e) {
 
-    attachListeners();
-    showSection('dashboard');
-}else {
-    currentUser = null;
-    detachListeners();
-    orders = [];
-    products = [];
-    $('app-view').classList.remove('active');
-    $('login-view').style.display = 'flex';
-  }
+  e.preventDefault();
+
+  auth.signOut();
+
 });
 
 function attachListeners() {
