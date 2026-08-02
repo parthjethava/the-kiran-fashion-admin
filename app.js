@@ -132,28 +132,30 @@ $('login-form').addEventListener('submit', function (e) {
   btn.textContent = "Logging in...";
 
   auth.signInWithEmailAndPassword(email, password)
-    .catch(function (err) {
-      errorBox.style.display = "block";
-      errorBox.textContent = err.message;
+.then(function(result) {
+    console.log("Login UID:", result.user.uid);
+})
+.catch(function(err) {
+    errorBox.style.display = "block";
+    errorBox.textContent = err.message;
 
-      btn.disabled = false;
-      btn.textContent = "Log in";
-    });
+    btn.disabled = false;
+    btn.textContent = "Log in";
 });
 
 
-auth.onAuthStateChanged(function (user) {
+auth.onAuthStateChanged(function(user) {
+
+  if (user) {
+    console.log("Auth UID:", user.uid);
+  }
 
   if (!user) {
-
     currentUser = null;
-
     detachListeners();
-
     orders = [];
     products = [];
-
-    $('app-view').classList.remove('active');
+    ...$('app-view').classList.remove('active');
     $('login-view').style.display = "flex";
 
     return;
