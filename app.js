@@ -115,106 +115,161 @@ function iconBoxes() {
 }
 
 /* ============================================================
-   AUTH
+AUTHENTICATION SECTION — CORRECTED
 ============================================================ */
 
+/* Holds the Firestore profile doc for the logged-in user (role, permissions, etc.) */
+var currentUserProfile = null;
+
+/* ---------------- LOGIN FORM ---------------- */
 $('login-form').addEventListener('submit', function (e) {
-  e.preventDefault();
+e.preventDefault();
+var email = $('login-email').value.trim();
+var password = $('login-password').value;
+var errorBox = $('login-error');
+var btn = $('login-btn');
+errorBox.style.display = 'none';
+btn.disabled = true;
+btn.textContent = 'Logging in...';
 
-  var email = $('login-email').value.trim();
-  var password = $('login-password').value;
+console.log('[AUTH] Attempting sign-in for:', email);
 
-  var btn = $('login-btn');
-  var errorBox = $('login-error');
-
-  errorBox.style.display = "none";
-  btn.disabled = true;
-  btn.textContent = "Logging in...";
-
-  auth.signInWithEmailAndPassword(email, password)
-.then(function(result) {
-    console.log("Login UID:", result.user.uid);
+auth.signInWithEmailAndPassword(email, password)
+.then(function (credential) {
+// Do NOT do any Firestore/user-profile logic here.
+// onAuthStateChanged below is the single source of truth for "user is logged in".
+// Handling it in two places is what usually causes race conditions.
+console.log('[AUTH] signInWithEmailAndPassword resolved. UID:', credential.user.uid);
 })
-.catch(function(err) {
-    errorBox.style.display = "block";
-    errorBox.textContent = err.message;
-
-    btn.disabled = false;
-    btn.textContent = "Log in";
+.catch(function (err) {
+console.error('[AUTH] signInWithEmailAndPassword failed:', err.code, err.message);
+var msg = 'Login failed. Please check your email and password.';
+if (err && err.code === 'auth/invalid-email') msg = 'That email address looks invalid.';
+if (err && err.code === 'auth/user-not-found') msg = 'No account found with that email.';
+if (err && err.code === 'auth/wrong-password') msg = 'Incorrect password.';
+if (err && err.code === 'auth/too-many-requests') msg = 'Too many attempts. Please wait and try again.';
+errorBox.textContent = msg;
+errorBox.style.display = 'block';
+})
+.finally(function () {
+btn.disabled = false;
+btn.textContent = 'Log in';
 });
-
-
-auth.onAuthStateChanged(function(user) {
-
-  if (user) {
-    console.log("Auth UID:", user.uid);
-  }
-
-  if (!user) {
-    currentUser = null;
-    detachListeners();
-    orders = [];
-    products = [];
-    ...$('app-view').classList.remove('active');
-    $('login-view').style.display = "flex";
-
-    return;
-  }
-
-  currentUser = user;
-
-  db.collection("users").doc(user.uid).get()
-    .then(function (doc) {
-
-      if (!doc.exists) {
-
-        auth.signOut();
-        alert("User not found");
-
-        return;
-      }
-
-      var data = doc.data();
-
-      window.issuperadmin = data.role === "superadmin";
-
-      if ($('admin-menu')) {
-        $('admin-menu').style.display =
-          window.issuperadmin ? "flex" : "none";
-      }
-
-      $('side-user').textContent = user.email;
-
-      $('login-view').style.display = "none";
-      $('app-view').classList.add("active");
-
-      $('login-form').reset();
-
-      var btn = $('login-btn');
-      btn.disabled = false;
-      btn.textContent = "Log in";
-
-      attachListeners();
-
-      showSection("dashboard");
-
-    })
-    .catch(function (err) {
-      alert(err.message);
-    });
-
 });
-
 
 $('logout-link').addEventListener('click', function (e) {
-
-  e.preventDefault();
-
-  auth.signOut();
-
+e.preventDefault();
+console.log('[AUTH] Logout requested.');
+auth.signOut();
 });
 
-function attachListeners() {
+/* ---------------- FETCH USER PROFILE FROM FIRESTORE ----------------
+Common causes of "User not found" even when the document exists:
+
+1. Reading db.collection('users').doc(user.uid) where user is undefined/
+stale because it was captured from a different closure than the one
+onAuthStateChanged actually gives you. Always use the user param
+passed into onAuthStateChanged itself, never a variable set earlier.
+
+
+2. Firestore security rules rejecting the read. A rejected (permission-denied)
+promise falls into .catch, NOT into the "!doc.exists" branch — if your
+old code had no .catch, that error was swallowed silently and whatever
+code ran next may have wrongly assumed "not found".
+
+
+3. Wrong Firebase project: verify firebaseConfig.projectId in firebase-config.js
+matches the EXACT project (top of Firebase console) where you created
+the "users" collection. A copy-pasted config from a different project/app
+will authenticate fine (if Auth is enabled there) but hit an empty Firestore.
+
+
+4. UID mismatch from copy-paste (leading/trailing space, wrong case, or a
+stray character). This code trims the UID and logs it so you can diff it
+byte-for-byte against the document ID shown in the Firebase console.
+------------------------------------------------------------------- */
+function fetchUserProfile(uid) {
+var cleanUid = String(uid || '').trim();
+console.log('[AUTH] fetchUserProfile() called with UID:', JSON.stringify(cleanUid));
+console.log('[AUTH] Reading from project:', firebase.app().options.projectId);
+
+
+
+return db.collection('users').doc(cleanUid).get()
+.then(function (doc) {
+console.log('[AUTH] Firestore get() resolved. doc.exists =', doc.exists);
+if (!doc.exists) {
+console.warn('[AUTH] No document at users/' + cleanUid + '. Check this ID against the Firebase console exactly.');
+return null;
+}
+var data = doc.data();
+console.log('[AUTH] User profile loaded:', data);
+return data;
+})
+.catch(function (err) {
+// This branch fires for permission-denied, network errors, etc.
+// If you were seeing "User not found" without ever seeing this log,
+// your old code had no .catch and was misreading a rejected promise.
+console.error('[AUTH] Firestore read failed:', err.code, err.message);
+throw err;
+});
+}
+
+/* ---------------- AUTH STATE OBSERVER ---------------- */
+auth.onAuthStateChanged(function (user) {
+console.log('[AUTH] onAuthStateChanged fired. user =', user ? user.uid : null);
+
+if (user) {
+console.log('[AUTH] User is signed in. Fetching Firestore profile before showing app...');
+
+fetchUserProfile(user.uid)  
+  .then(function (profile) {  
+    if (!profile) {  
+      console.warn('[AUTH] Signing out because no matching users/ document was found.');  
+      alert('User not found. Please contact your administrator.');  
+      return auth.signOut();  
+    }  
+
+    // Optional: block login for disabled accounts. Remove this block  
+    // if you don't use a "status" field for access control.  
+    if (profile.status && profile.status !== 'active') {  
+      console.warn('[AUTH] Signing out because account status is:', profile.status);  
+      alert('Your account is ' + profile.status + '. Please contact your administrator.');  
+      return auth.signOut();  
+    }  
+
+    // Success path — everything below only runs once the profile is confirmed.  
+    currentUser = user;  
+    currentUserProfile = profile;  
+    console.log('[AUTH] Login fully confirmed. Role:', profile.role, '| Permissions:', profile.permissions);  
+
+    $('side-user').textContent = (profile.name || user.email) + (profile.role ? ' \u00b7 ' + profile.role : '');  
+    $('login-view').style.display = 'none';  
+    $('app-view').classList.add('active');  
+    $('login-form').reset();  
+    $('login-error').style.display = 'none';  
+
+    attachListeners();  
+    showSection('dashboard');  
+  })  
+  .catch(function (err) {  
+    console.error('[AUTH] Profile lookup errored — signing out for safety.', err);  
+    alert('Could not verify your account (' + err.message + '). Please try again.');  
+    auth.signOut();  
+  });
+
+} else {
+console.log('[AUTH] User is signed out. Resetting app state.');
+currentUser = null;
+currentUserProfile = null;
+detachListeners();
+orders = [];
+products = [];
+$('app-view').classList.remove('active');
+$('login-view').style.display = 'flex';
+}
+});
+
   if (ordersUnsub) ordersUnsub();
   if (productsUnsub) productsUnsub();
 
