@@ -270,9 +270,20 @@ $('login-view').style.display = 'flex';
 }
 });
 
+ function attachListeners() {
+
   if (ordersUnsub) ordersUnsub();
   if (productsUnsub) productsUnsub();
 
+  ordersUnsub = db.collection("orders")
+    .orderBy("createdAt","desc")
+    .onSnapshot(...);
+
+  productsUnsub = db.collection("products")
+    .orderBy("name")
+    .onSnapshot(...);
+
+}
   ordersUnsub = db.collection('orders').orderBy('createdAt', 'desc').onSnapshot(function (snap) {
     orders = snap.docs.map(function (doc) {
       var d = doc.data();
