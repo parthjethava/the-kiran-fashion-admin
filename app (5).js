@@ -113,55 +113,242 @@ function iconTrash() {
 function iconBoxes() {
   return '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8L12 3 3 8l9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/></svg>';
 }
-
 /* ============================================================
    AUTHENTICATION SECTION
    ============================================================ */
 
-/* Holds the Firestore profile doc for the logged-in user (role, permissions, etc.) */
 var currentUserProfile = null;
 
 /* ---------------- LOGIN FORM ---------------- */
+
 $('login-form').addEventListener('submit', function (e) {
   e.preventDefault();
+
   var email = $('login-email').value.trim();
   var password = $('login-password').value;
   var errorBox = $('login-error');
   var btn = $('login-btn');
+
   errorBox.style.display = 'none';
   btn.disabled = true;
   btn.textContent = 'Logging in...';
 
-  console.log('[AUTH] Attempting sign-in for:', email);
+  console.log('[AUTH] Login attempt:', email);
 
   auth.signInWithEmailAndPassword(email, password)
     .then(function (credential) {
-      // Do NOT do any Firestore/user-profile logic here.
-      // onAuthStateChanged below is the single source of truth for "user is logged in".
-      // Handling it in two places is what usually causes race conditions.
-      console.log('[AUTH] signInWithEmailAndPassword resolved. UID:', credential.user.uid);
+
+      console.log('[AUTH] Firebase Authentication SUCCESS');
+      console.log('[AUTH] UID:', credential.user.uid);
+      console.log('[AUTH] Email:', credential.user.email);
+
     })
     .catch(function (err) {
-      console.error('[AUTH] signInWithEmailAndPassword failed:', err.code, err.message);
+
+      console.error('[AUTH] Login ERROR:', err.code, err.message);
+
       var msg = 'Login failed. Please check your email and password.';
-      if (err && err.code === 'auth/invalid-email') msg = 'That email address looks invalid.';
-      if (err && err.code === 'auth/user-not-found') msg = 'No account found with that email.';
-      if (err && err.code === 'auth/wrong-password') msg = 'Incorrect password.';
-      if (err && err.code === 'auth/too-many-requests') msg = 'Too many attempts. Please wait and try again.';
+
+      if (err.code === 'auth/invalid-email') {
+        msg = 'Invalid email address.';
+      } else if (err.code === 'auth/user-not-found') {
+        msg = 'No account found with this email.';
+      } else if (err.code === 'auth/wrong-password') {
+        msg = 'Incorrect password.';
+      } else if (err.code === 'auth/invalid-credential') {
+        msg = 'Incorrect email or password.';
+      } else if (err.code === 'auth/too-many-requests') {
+        msg = 'Too many attempts. Please try again later.';
+      }
+
       errorBox.textContent = msg;
       errorBox.style.display = 'block';
+
     })
     .finally(function () {
+
       btn.disabled = false;
       btn.textContent = 'Log in';
+
     });
 });
 
+
+/* ---------------- LOGOUT ---------------- */
+
 $('logout-link').addEventListener('click', function (e) {
   e.preventDefault();
-  console.log('[AUTH] Logout requested.');
-  auth.signOut();
+
+  auth.signOut()
+    .then(function () {
+      console.log('[AUTH] Logged out.');
+    });
 });
+
+
+/* ============================================================
+   FETCH USER PROFILE
+   ============================================================ */
+
+function fetchUserProfile(uid) {
+
+  console.log('[AUTH] Checking users/' + uid);
+
+  return db.collection('users')
+    .doc(uid)
+    .get()
+    .then(function (doc) {
+
+      console.log('[AUTH] Profile exists:', doc.exists);
+
+      if (!doc.exists) {
+        return null;
+      }
+
+      return doc.data();
+
+    });
+
+}
+
+
+/* ============================================================
+   AUTH STATE
+   ============================================================ */
+
+auth.onAuthStateChanged(function (user) {
+
+  console.log('[AUTH] Auth state changed:', user ? user.uid : 'SIGNED OUT');
+
+  if (!user) {
+
+    currentUser = null;
+    currentUserProfile = null;
+
+    detachListeners();
+
+    orders = [];
+    products = [];
+
+    $('app-view').classList.remove('active');
+    $('login-view').style.display = 'flex';
+
+    return;
+  }
+
+
+  /* USER IS AUTHENTICATED */
+
+  console.log('[AUTH] Authenticated UID:', user.uid);
+
+  fetchUserProfile(user.uid)
+
+    .then(function (profile) {
+
+      /*
+       * IMPORTANT:
+       * Login must NOT automatically logout just because
+       * Firestore profile is missing.
+       */
+
+      if (!profile) {
+
+        console.warn(
+          '[AUTH] No users/' + user.uid + ' profile found.'
+        );
+
+        /*
+         * Temporary Super Admin bootstrap.
+         *
+         * This allows the Firebase Authentication account
+         * to enter the CRM even if the Firestore profile
+         * has not been created yet.
+         */
+
+        profile = {
+          name: user.email,
+          email: user.email,
+          role: 'super admin',
+          status: 'active',
+          permissions: {}
+        };
+
+      }
+
+
+      /* ---------------- USER DATA ---------------- */
+
+      currentUser = user;
+      currentUserProfile = profile;
+
+
+      console.log(
+        '[AUTH] LOGIN SUCCESS',
+        'Role:',
+        profile.role
+      );
+
+
+      /* ---------------- SHOW APP ---------------- */
+
+      $('side-user').textContent =
+        (profile.name || user.email) +
+        (profile.role ? ' · ' + profile.role : '');
+
+
+      $('login-view').style.display = 'none';
+      $('app-view').classList.add('active');
+
+      $('login-form').reset();
+      $('login-error').style.display = 'none';
+
+
+      /* ---------------- LOAD CRM ---------------- */
+
+      attachListeners();
+
+      showSection('dashboard');
+
+    })
+
+    .catch(function (err) {
+
+      console.error(
+        '[AUTH] Profile error:',
+        err.code,
+        err.message
+      );
+
+      /*
+       * DO NOT signOut here.
+       *
+       * Authentication already succeeded.
+       */
+
+      currentUser = user;
+
+      currentUserProfile = {
+        name: user.email,
+        email: user.email,
+        role: 'super admin',
+        status: 'active',
+        permissions: {}
+      };
+
+      $('side-user').textContent =
+        user.email + ' · super admin';
+
+      $('login-view').style.display = 'none';
+      $('app-view').classList.add('active');
+
+      attachListeners();
+
+      showSection('dashboard');
+
+    });
+
+});
+
 
 /* ---------------- FETCH USER PROFILE FROM FIRESTORE ---------------- */
 function fetchUserProfile(uid) {
